@@ -1,4 +1,4 @@
-import { Event } from '../Utils/Event';
+import { Event } from '../TopCoreLevel/Event';
 
 type InputCheckFunc = (keyName: string) => void;
 

@@ -8,21 +8,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 /**
- * Allows working with files in a simple, browser-friendly manner.
+ * Allows working with files in a browser-friendly manner.
  */
 export class File {
     /**
-     * Asynchronously reads a file and returns the contents.
-     * @param path Relative to where the game's index.html file is
-     * (or in the case of an MV project, the project root)
+     * Asynchronously reads a file and calls a callback when it's done.
+     * @param path Relative to where the game's index.html file is.
      */
-    static Read(path) {
+    static Read(path, callback) {
         return __awaiter(this, void 0, void 0, function* () {
-            let fileText;
             yield fetch(path)
                 .then(response => response.text())
-                .then(responseText => fileText = responseText);
-            return fileText;
+                .then(responseText => callback(responseText));
         });
     }
 }

@@ -1,4 +1,4 @@
-import { GetScaleFactor } from '../Structures/Utils';
+import { GetScaleFactor } from '../Structures/Utils/GetScaleFactor';
 'use strict';
 
 (function()

@@ -3,66 +3,6 @@
 
     (function () {
         let extensions = {
-            IsOfType(obj, input) {
-                let inputIsFunction = typeof input === 'function';
-                if (!inputIsFunction) {
-                    console.log("Input is not function");
-                    throw 'IsOfType only accepts function or class args.';
-                }
-                let classOfObj = obj.constructor;
-                return this.IsOfExactType(obj, input) ||
-                    input.isPrototypeOf(classOfObj) ||
-                    classOfObj.isPrototypeOf(input);
-            },
-            IsOfExactType(obj, input) {
-                let inputIsFunction = typeof input === 'function';
-                if (!inputIsFunction) {
-                    throw 'isOfExactType only accepts function or class args.';
-                }
-                return obj.constructor === input;
-            }
-        };
-        Object.assign(Object, extensions);
-    })();
-
-    (function () {
-        let extensions = {
-            remove(toRemove) {
-                let index = this.indexOf(toRemove);
-                if (index >= 0)
-                    this.splice(index, 1);
-            },
-            copy() {
-                return this.slice();
-            },
-            Filter(test, context) {
-                context = context || this; // context is optional
-                let result = [];
-                for (let i = 0; i < this.length; i++) {
-                    let item = this[i];
-                    let passedTest = test.call(context, item) === true;
-                    if (passedTest)
-                        result.push(item);
-                }
-                return result;
-            },
-            clear() {
-                while (this.length > 0)
-                    this.shift();
-            }
-        };
-        Object.assign(Array.prototype, extensions);
-        // Later versions of MV may already provide the following
-        Array.prototype.includes = Array.prototype.includes || function (element) {
-            for (let i = 0; i < this.length; i++)
-                if (this[i] === element)
-                    return true;
-            return false;
-        };
-    })();
-
-    (function () {
-        let extensions = {
             /**
              * Add a callback function that will be called when the bitmap is loaded.
              * Author: MinusGix
@@ -152,7 +92,7 @@
         // Algorithm credit to Michael Labe from Stack Overflow
         let windowAspect = firstWidth / firstHeight;
         let imageAspect = secondWidth / secondHeight;
-        let scaleFactor = 0;
+        let scaleFactor = undefined;
         if (windowAspect > imageAspect)
             scaleFactor = firstHeight / secondHeight;
         else
@@ -331,6 +271,263 @@
         __proto__: null,
         Sound: Sound,
         get SoundType () { return SoundType; }
+    });
+
+    class CGTIterator {
+        constructor(iteratee) {
+            this.iteratee = iteratee;
+        }
+        get Value() { return this.value; }
+    }
+
+    class ArrayIterator extends CGTIterator {
+        constructor(arr) {
+            super(arr);
+            this.arr = arr;
+            this.valueIndex = -1;
+        }
+        get ValueIndex() { return this.valueIndex; }
+        Next() {
+            if (!this.HasNext()) {
+                throw 'There is no next element for this iterator to return.';
+            }
+            this.valueIndex++;
+            this.UpdateValue();
+            return this.value;
+        }
+        HasNext() {
+            return this.arr.length > 1 && this.valueIndex < this.arr.length - 1;
+        }
+        UpdateValue() {
+            this.value = this.arr[this.valueIndex];
+        }
+        Previous() {
+            if (!this.HasPrevious()) {
+                throw 'There is no previous element for this iterator to return.';
+            }
+            this.valueIndex--;
+            this.UpdateValue();
+            return this.value;
+        }
+        HasPrevious() {
+            return this.arr.length > 1 && this.valueIndex > 0;
+        }
+    }
+
+    class ObjectEx {
+        static IsOfType(obj, input) {
+            let inputIsFunction = typeof input === 'function';
+            if (!inputIsFunction) {
+                console.log("Input is not function");
+                throw 'IsOfType only accepts function or class args.';
+            }
+            let classOfObj = obj.constructor;
+            return this.IsOfExactType(obj, input) ||
+                input.isPrototypeOf(classOfObj) ||
+                classOfObj.isPrototypeOf(input);
+        }
+        static IsOfExactType(obj, input) {
+            let inputIsFunction = typeof input === 'function';
+            if (!inputIsFunction) {
+                throw 'isOfExactType only accepts function or class args.';
+            }
+            return obj.constructor === input;
+        }
+    }
+
+    class ArrayEx {
+        static Remove(arr, toRemove) {
+            let index = arr.indexOf(toRemove);
+            if (index >= 0)
+                arr.splice(index, 1);
+        }
+        static Copy(arr) {
+            return arr.slice();
+        }
+        static Filter(arr, test, context) {
+            context = context || arr; // context is optional
+            let result = [];
+            for (let i = 0; i < arr.length; i++) {
+                let item = this[i];
+                let passedTest = test.call(context, item) === true;
+                if (passedTest)
+                    result.push(item);
+            }
+            return result;
+        }
+        static Clear(arr) {
+            while (arr.length > 0)
+                arr.shift();
+        }
+    }
+
+    class TightArray extends Array {
+        constructor(capacity) {
+            super(capacity);
+            if (ObjectEx.IsOfType(capacity, Number)) {
+                this.capacity = capacity;
+                ArrayEx.Clear(this); // To ensure this starts with nothing in it
+            }
+            else
+                this.capacity = this.length * 2;
+        }
+        get capacity() { return this._capacity; }
+        set capacity(value) { this._capacity = Math.max(1, value); }
+        push(...args) {
+            for (const item of args) {
+                if (this.length == this.capacity)
+                    this.shift();
+                super.push(item);
+            }
+            return this.length;
+        }
+        hasRoom() {
+            return this.length < this.capacity;
+        }
+    }
+
+    class DestructibleCache {
+        constructor(capacity) {
+            capacity = capacity || 10;
+            this.items = new TightArray(capacity);
+            this.Capacity = capacity;
+            this.AutoWipe = true;
+        }
+        get Items() { return this.items; }
+        get Capacity() { return this.capacity; }
+        set Capacity(value) {
+            this.capacity = value;
+            this.Items.capacity = value;
+        }
+        get AutoWipe() { return this.autoWipe; }
+        set AutoWipe(value) { this.autoWipe = value; }
+        Push(destructible) {
+            this.MakeRoomIfNecessary();
+            this.Items.push(destructible);
+        }
+        MakeRoomIfNecessary() {
+            if (!this.HasRoom()) {
+                let removed = this.Items.shift();
+                if (this.AutoWipe)
+                    removed.destroy();
+            }
+        }
+        HasRoom() {
+            return this.items.hasRoom();
+        }
+        Remove(destructible) {
+            let thisHadDestructible = this.Items.includes(destructible);
+            if (thisHadDestructible) {
+                ArrayEx.Remove(this.Items, destructible);
+                if (this.AutoWipe)
+                    destructible.destroy();
+            }
+            let removed = thisHadDestructible;
+            return removed;
+        }
+        Clear() {
+            if (this.AutoWipe)
+                this.ClearAndWipe();
+            else
+                ArrayEx.Clear(this.Items);
+        }
+        ClearAndWipe() {
+            for (const destructible of this.Items) {
+                destructible.destroy();
+            }
+            ArrayEx.Clear(this.Items);
+        }
+    }
+
+    /**
+     * Only here to support legacy plugins. Use Map instead when you can.
+     */
+    class Dictionary {
+        constructor() {
+            // The keys always have the same indexes as their values.
+            this.keys = [];
+            this.values = [];
+        }
+        get Keys() { return this.keys; }
+        get Values() { return this.values; }
+        get Length() { return this.keys.length; }
+        // Methods
+        /**
+         * Adds the passed key-value pair to this dictionary. If the key was
+         * already added, the value is overwritten.
+         * */
+        Add(key, value) {
+            if (this.HasKey(key))
+                this.MapNewValueToExistingKey(value, key);
+            else
+                this.RegisterNewKeyValuePair(key, value);
+        }
+        MapNewValueToExistingKey(value, key) {
+            let index = this.keys.indexOf(key);
+            this.values[index] = value;
+        }
+        RegisterNewKeyValuePair(key, value) {
+            this.keys.push(key);
+            this.values.push(value);
+        }
+        /**
+         * Removes the key (and its mapped value) from this dictionary.
+         * Returns true if successful, false otherwise.
+         *  */
+        Remove(key) {
+            if (this.HasKey(key)) {
+                let index = this.keys.indexOf(key);
+                this.RemoveKeyValuePairAtIndex(index);
+                return true;
+            }
+            return false;
+        }
+        RemoveKeyValuePairAtIndex(index) {
+            this.keys.splice(index, 1);
+            this.values.splice(index, 1);
+        }
+        /** Returns the value mapped to the passed key, if there is one. Returns null otherwise. */
+        Get(key) {
+            if (this.HasKey(key)) {
+                let index = this.GetKeyIndex(key);
+                return this.ValueAtThatSameIndex(index);
+            }
+            else
+                return null;
+        }
+        GetKeyIndex(key) {
+            return this.keys.indexOf(key);
+        }
+        ValueAtThatSameIndex(index) {
+            return this.values[index];
+        }
+        GetValueAtIndex(index) {
+            if (this.IndexIsValid(index))
+                return this.values[index];
+        }
+        IndexIsValid(index) {
+            return index >= 0 && index < this.values.length;
+        }
+        HasKey(key) {
+            return this.keys.includes(key);
+        }
+        HasValue(value) {
+            return this.values.includes(value);
+        }
+        /** Removes all key-value pairs from this dictionary. */
+        Clear() {
+            this.keys = [];
+            this.values = [];
+        }
+    }
+
+    var Collections = /*#__PURE__*/Object.freeze({
+        __proto__: null,
+        ArrayIterator: ArrayIterator,
+        CGTIterator: CGTIterator,
+        DestructibleCache: DestructibleCache,
+        Dictionary: Dictionary,
+        TightArray: TightArray
     });
 
     /**
@@ -583,10 +780,288 @@
         ColorFactory: ColorFactory
     });
 
+    class BitmapEx {
+        /**
+         * Add a callback function that will be called when the bitmap is loaded.
+         * Author: MinusGix
+         */
+        AddLoadListener(bitmap, listener) {
+            if (!bitmap.isReady()) {
+                // @ts-ignore
+                bitmap._loadListeners.push(listener);
+            }
+            else {
+                listener(bitmap);
+            }
+        }
+        RemoveLoadListener(bitmap, listener) {
+            // @ts-ignore
+            ArrayEx.Remove(bitmap._loadListeners, listener);
+        }
+        HasLoadListener(bitmap, listener) {
+            // @ts-ignore
+            return bitmap._loadListeners.includes(listener);
+        }
+        /**
+         * Returns a resized version of the bitmap (if it is ready). Note that
+         * the aspect ratio may not be the same, based on the passed width and height.
+         */
+        Resized(bitmap, width, height) {
+            if (!bitmap.isReady())
+                return;
+            var newBitmap = new Bitmap(width, height);
+            newBitmap.blt(bitmap, 0, 0, bitmap.width, bitmap.height, 0, 0, width, height);
+            return newBitmap;
+        }
+    }
+
+    class Game_ActionEx {
+        /** Returns the action's item if it's a skill. Null otherwise. */
+        static AsSkill(action) {
+            var skill = $dataSkills[action.item().id];
+            if (skill != undefined)
+                return skill;
+            else
+                return null;
+        }
+        /** Returns the action's item if it's a normal item. Null otherwise. */
+        static AsItem(action) {
+            var item = $dataItems[action.item().id];
+            if (item != undefined)
+                return item;
+            else
+                return null;
+        }
+        /** Returns this action's subject if the subject is an enemy. Null otherwise. */
+        static SubjectAsEnemy(action) {
+            return Game_ActionEx.SubjectAsType(action, Game_Enemy);
+        }
+        static SubjectAsType(action, typeWanted) {
+            var subject = action.subject();
+            if (subject instanceof typeWanted)
+                return subject;
+            else
+                return null;
+        }
+        /** Returns this action's subject if the subject is an actor. Null otherwise. */
+        static SubjectAsActor(action) {
+            return Game_ActionEx.SubjectAsType(action, Game_Actor);
+        }
+    }
+
+    class PIXISpriteEx {
+        static Resized(sprite, width, height) {
+            let newSprite = new PIXI.Sprite(sprite.texture);
+            newSprite.width = width;
+            newSprite.height = height;
+            return newSprite;
+        }
+        static Copy(sprite) {
+            let newSprite = new PIXI.Sprite(sprite.texture);
+            newSprite.width = sprite.width;
+            newSprite.height = sprite.height;
+            return newSprite;
+        }
+        static Resize(sprite, width, height) {
+            sprite.width = width;
+            sprite.height = height;
+        }
+        static ResizeWhileKeepingAspectFor(sprite, targetWidth, targetHeight) {
+            let scaleFactor = GetScaleFactor(targetWidth, targetHeight, sprite.texture.width, sprite.texture.height);
+            sprite.width = sprite.texture.width * scaleFactor;
+            sprite.height = sprite.texture.height * scaleFactor;
+        }
+    }
+
     var Extensions = /*#__PURE__*/Object.freeze({
         __proto__: null,
-        NumberEx: NumberEx
+        ArrayEx: ArrayEx,
+        BitmapEx: BitmapEx,
+        Game_ActionEx: Game_ActionEx,
+        NumberEx: NumberEx,
+        ObjectEx: ObjectEx,
+        PIXISpriteEx: PIXISpriteEx
     });
+
+    var InputCode;
+    (function (InputCode) {
+        InputCode["tab"] = "tab";
+        InputCode["ok"] = "ok";
+        InputCode["enter"] = "ok";
+        InputCode["space"] = "ok";
+        InputCode["Z"] = "ok";
+        InputCode["shift"] = "shift";
+        InputCode["control"] = "control";
+        InputCode["alt"] = "control";
+        InputCode["escape"] = "escape";
+        InputCode["numpad0"] = "escape";
+        InputCode["insert"] = "escape";
+        InputCode["X"] = "escape";
+        InputCode["pageUp"] = "pageup";
+        InputCode["Q"] = "pageup";
+        InputCode["pageDown"] = "pagedown";
+        InputCode["W"] = "pagedown";
+        InputCode["leftArrow"] = "left";
+        InputCode["numpad4"] = "left";
+        InputCode["upArrow"] = "up";
+        InputCode["numpad8"] = "up";
+        InputCode["rightArrow"] = "right";
+        InputCode["numpad6"] = "right";
+        InputCode["downArrow"] = "down";
+        InputCode["numpad2"] = "down";
+        InputCode["f9"] = "debug";
+        InputCode["null"] = "null";
+    })(InputCode || (InputCode = {}));
+
+    class Event {
+        /** Throws an exception if a negative number of args are passed. */
+        constructor(argCount = 0) {
+            this.argCount = argCount;
+            this.callbacks = new Map();
+            this.invocationStr = '';
+            this.funcToCall = null;
+            this.callerName = 'caller';
+            this.CheckIfArgCountISValid(argCount);
+            this.SetupCallbackInvocationString();
+        }
+        // Getters
+        get ArgCount() { return this.argCount; }
+        CheckIfArgCountISValid(argCount) {
+            if (argCount < 0) {
+                let message = 'Cannot init CGT Event with a negative arg count.';
+                //alert(message);
+                throw message;
+            }
+        }
+        AddListener(func, caller = null) {
+            if (this.callbacks.get(caller) == null)
+                this.callbacks.set(caller, []);
+            this.callbacks.get(caller).push(func);
+        }
+        RemoveListener(func, caller = null) {
+            if (this.callbacks.get(caller) == null)
+                return;
+            let callbackArr = this.callbacks.get(caller);
+            ArrayEx.Remove(callbackArr, func);
+        }
+        /**
+         * Invokes all callbacks registered under this event. Throws an exception if an inappropriate
+         * number of args is passed.
+         * */
+        Invoke(...args) {
+            // Safety
+            if (args.length != this.ArgCount) {
+                let message = `ERROR: call to Event invoke() passed wrong amount of arguments. \
+            Amount passed: ${args.length} Amount Needed: ${this.ArgCount}`;
+                //alert(message);
+                throw message;
+            }
+            // Going through the callers...
+            let callers = Array.from(this.callbacks.keys());
+            for (let i = 0; i < callers.length; i++) {
+                let caller = callers[i];
+                // Go through all the funcs registered under the caller, and execute them one by 
+                // one with this object's invocation string.
+                let toExecute = this.callbacks.get(caller);
+                for (let i = 0; i < toExecute.length; i++) {
+                    this.funcToCall = toExecute[i];
+                    eval(this.invocationStr);
+                }
+            }
+        }
+        SetupCallbackInvocationString() {
+            this.invocationStr = 'this.funcToCall.call(' + this.callerName;
+            if (this.ArgCount > 0)
+                this.invocationStr += ', ';
+            else
+                this.invocationStr += ')';
+            for (let i = 0; i < this.ArgCount; i++) {
+                let argString = 'arguments[' + i + ']';
+                if (i == this.ArgCount - 1) // Are we at the last arg?
+                    argString += ');';
+                else
+                    argString += ', ';
+                this.invocationStr += argString;
+            }
+        }
+        toString() {
+            return '[object CGT.Core.Utils.Event]';
+        }
+    }
+
+    class SignalerImplementation {
+        constructor() {
+            this.inputEvents = new Map();
+            this.inputs = [
+                'tab',
+                'ok',
+                'shift',
+                'control',
+                'escape',
+                'pageup',
+                'pagedown',
+                'left',
+                'up',
+                'right',
+                'down',
+                'debug'
+            ];
+            this.inputPressed = new Event(1);
+            this.inputRepeated = new Event(1);
+            this.inputTriggered = new Event(1);
+            this.inputLongPressed = new Event(1);
+            this.InitInputEventDict();
+            this.inputCheckFuncs = Array.from(this.inputEvents.keys());
+        }
+        get InputPressed() { return this.inputPressed; }
+        get InputRepeated() { return this.inputRepeated; }
+        get InputTriggered() { return this.inputTriggered; }
+        get InputLongPressed() { return this.inputLongPressed; }
+        InitInputEventDict() {
+            this.inputEvents.set(Input.isPressed, this.InputPressed);
+            this.inputEvents.set(Input.isRepeated, this.InputRepeated);
+            this.inputEvents.set(Input.isTriggered, this.InputTriggered);
+            this.inputEvents.set(Input.isLongPressed, this.InputLongPressed);
+        }
+        HandleInputSignaling() {
+            for (let currentInput of this.inputs) {
+                for (let userEnteredInput of this.inputCheckFuncs) {
+                    if (userEnteredInput.call(Input, currentInput) === true) {
+                        let eventToInvoke = this.inputEvents.get(userEnteredInput);
+                        eventToInvoke.Invoke(currentInput);
+                    }
+                }
+            }
+        }
+    }
+    let InputSignaler = new SignalerImplementation();
+
+    class InputObserver {
+        constructor() {
+            this.ListenForInputs();
+        }
+        ListenForInputs() {
+            InputSignaler.InputLongPressed.AddListener(this.OnInputLongPressed, this);
+            InputSignaler.InputPressed.AddListener(this.OnInputPressed, this);
+            InputSignaler.InputTriggered.AddListener(this.OnInputTriggered, this);
+            InputSignaler.InputRepeated.AddListener(this.OnInputRepeated, this);
+        }
+        // Override any one of these
+        OnInputTriggered(input) { }
+        OnInputPressed(input) { }
+        OnInputLongPressed(input) { }
+        OnInputRepeated(input) { }
+        Destroy() {
+            this.UnlistenForInputs();
+        }
+        UnlistenForInputs() {
+            InputSignaler.InputLongPressed.RemoveListener(this.OnInputLongPressed, this);
+            InputSignaler.InputPressed.RemoveListener(this.OnInputPressed, this);
+            InputSignaler.InputTriggered.RemoveListener(this.OnInputTriggered, this);
+            InputSignaler.InputRepeated.RemoveListener(this.OnInputRepeated, this);
+        }
+    }
+    InputObserver.Null = Object.freeze(new InputObserver());
 
     var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
         function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -598,21 +1073,18 @@
         });
     };
     /**
-     * Allows working with files in a simple, browser-friendly manner.
+     * Allows working with files in a browser-friendly manner.
      */
     class File {
         /**
-         * Asynchronously reads a file and returns the contents.
-         * @param path Relative to where the game's index.html file is
-         * (or in the case of an MV project, the project root)
+         * Asynchronously reads a file and calls a callback when it's done.
+         * @param path Relative to where the game's index.html file is.
          */
-        static Read(path) {
+        static Read(path, callback) {
             return __awaiter(this, void 0, void 0, function* () {
-                let fileText;
                 yield fetch(path)
                     .then(response => response.text())
-                    .then(responseText => fileText = responseText);
-                return fileText;
+                    .then(responseText => callback(responseText));
             });
         }
     }
@@ -622,15 +1094,123 @@
         File: File
     });
 
+    class Font {
+        constructor(face, size, isItalic) {
+            this.face = face;
+            this.size = size;
+            this.isItalic = isItalic;
+            this.Face = face || "GameFont";
+            this.Size = size || 28;
+            this.IsItalic = isItalic || false;
+        }
+        set Face(value) { this.face = value; }
+        set Size(value) { this.size = value; }
+        set IsItalic(value) { this.isItalic = value; }
+        static FromBitmap(bitmap) {
+            let font = new Font();
+            font.Face = bitmap.fontFace;
+            font.Size = bitmap.fontSize;
+            font.IsItalic = bitmap.fontItalic;
+            return font;
+        }
+        get Face() { return this.face; }
+        get Size() { return this.size; }
+        get IsItalic() { return this.isItalic; }
+        Copy() {
+            let copy = new Font();
+            copy.SetFrom(this);
+            return copy;
+        }
+        SetFrom(other) {
+            this.Face = other.Face;
+            this.Size = other.Size;
+            this.IsItalic = other.IsItalic;
+        }
+        ApplyTo(bitmap) {
+            bitmap.fontFace = this.Face;
+            bitmap.fontSize = this.Size;
+            bitmap.fontItalic = this.IsItalic;
+        }
+        Equals(other) {
+            return this.Face === other.Face &&
+                this.Size === other.Size &&
+                this.IsItalic === other.IsItalic;
+        }
+        toString() {
+            return '[object CGT.Core.Text.Font]';
+        }
+    }
+    Font.Default = new Font("GameFont", 28, false);
+    Font.Null = Object.freeze(new Font());
+
+    var Utils = /*#__PURE__*/Object.freeze({
+        __proto__: null,
+        GetScaleFactor: GetScaleFactor
+    });
+
+    let Callbacks = SetupEvents();
+    function SetupEvents() {
+        let callbacks = {
+            TitleScreenStart: new Event(0),
+            BattleStart: new Event(0),
+            BattleEnd: new Event(1),
+            DamageExecute: new Event(2),
+            EnemyDeath: new Event(1),
+        };
+        return callbacks;
+    }
+    HookUpCallbacks();
+    function HookUpCallbacks() {
+        // Funcs to alias
+        let oldSceneTitleStart = Scene_Title.prototype.start;
+        let oldStartBattle = BattleManager.startBattle;
+        let oldEndBattle = BattleManager.endBattle;
+        let oldExecuteDamage = Game_Action.prototype.executeDamage;
+        let oldEnemyDeath = Game_Enemy.prototype.die;
+        // Func aliases
+        function NewSceneTitleStart() {
+            oldSceneTitleStart.call(this);
+            Callbacks.TitleScreenStart.Invoke();
+        }
+        function NewStartBattle() {
+            oldStartBattle.call(this);
+            Callbacks.BattleStart.Invoke();
+        }
+        function NewEndBattle(result) {
+            oldEndBattle.call(this, result);
+            Callbacks.BattleEnd.Invoke(result);
+        }
+        function NewExecuteDamage(target, value) {
+            oldExecuteDamage.call(this, target, value);
+            Callbacks.DamageExecute.Invoke(target, value);
+        }
+        function NewEnemyDie() {
+            oldEnemyDeath.call(this);
+            Callbacks.EnemyDeath.Invoke(this);
+        }
+        ApplyFuncAliases();
+        function ApplyFuncAliases() {
+            Scene_Title.prototype.start = NewSceneTitleStart;
+            BattleManager.startBattle = NewStartBattle;
+            BattleManager.endBattle = NewEndBattle;
+            Game_Action.prototype.executeDamage = NewExecuteDamage;
+            Game_Enemy.prototype.die = NewEnemyDie;
+        }
+    }
+
     let CGT = {
         version: 1.01,
         path: "./_CGT1.6.x/",
         Core: {
             path: "./_CGT1.6.x/CoreEngine/",
             Audio: Audio,
+            Collections: Collections,
             Extensions: Extensions,
             Graphics: Graphics,
             IO: IO,
+            Utils: Utils,
+            Event: Event,
+            Callbacks: Callbacks,
         },
     };
     // @ts-ignore

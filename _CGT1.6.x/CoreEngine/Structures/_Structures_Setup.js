@@ -1,8 +1,16 @@
 import * as Audio_1 from "./Audio/_Audio_Setup";
 export { Audio_1 as Audio };
-import * as Graphics_1 from "./Graphics/_GraphicsSetup";
+import * as Collections_1 from "./Collections/_Collections_Setup";
+export { Collections_1 as Collections };
+import * as Graphics_1 from "./Graphics/_Graphics_Setup";
 export { Graphics_1 as Graphics };
 import * as Extensions_1 from "./Extensions/_Extensions_Setup";
 export { Extensions_1 as Extensions };
+import * as Input_1 from "./Input/_Input_Setup";
+export { Input_1 as Input };
 import * as IO_1 from "./IO/_IO_Setup";
 export { IO_1 as IO };
+import * as Text_1 from "./Text/_Text_Setup";
+export { Text_1 as Text };
+import * as Utils_1 from "./Utils/_Utils_Setup";
+export { Utils_1 as Utils };

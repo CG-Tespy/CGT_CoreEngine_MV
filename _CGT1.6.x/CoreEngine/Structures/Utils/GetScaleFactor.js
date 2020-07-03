@@ -2,7 +2,7 @@ export function GetScaleFactor(firstWidth, firstHeight, secondWidth, secondHeigh
     // Algorithm credit to Michael Labe from Stack Overflow
     let windowAspect = firstWidth / firstHeight;
     let imageAspect = secondWidth / secondHeight;
-    let scaleFactor = 0;
+    let scaleFactor = undefined;
     if (windowAspect > imageAspect)
         scaleFactor = firstHeight / secondHeight;
     else

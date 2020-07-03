@@ -1,10 +1,10 @@
 import resolve from 'rollup-plugin-node-resolve';
 
 export default {
-	input: "./CGT_CoreEngine_Main.js",
+	input: "./CGT_CoreEngine_MV_Main.js",
 	output: 
 	{
-		file: "./CGT_CoreEngine_Main_Bundle.js",
+		file: "./CGT_CoreEngine_MV_Main_Bundle.js",
 		format: 'iife'
 	},
 
