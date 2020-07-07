@@ -1,4 +1,4 @@
-import { Event } from '../TopCoreLevel/Event';
+import { Event } from '../Utils/Event';
 class SignalerImplementation {
     constructor() {
         this.inputEvents = new Map();

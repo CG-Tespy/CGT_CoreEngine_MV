@@ -15,11 +15,7 @@ rob - https://stackoverflow.com/users/563532/rob
 */
 import { CGT } from "./_CGT1.6.x/_CGT_CoreEngine_Setup";
 console.log(CGT);
-/*
 let filePath = "data/BoDiSyPages/someTextFile.txt";
 let File = CGT.Core.IO.File;
-let fileText: string;
-
-File.Read(filePath).then(txt => fileText);
+let fileText = File.ReadSync(filePath);
 console.log(fileText);
-*/

@@ -1,5 +1,3 @@
-
-
 /**
  * Only here to support legacy plugins. Use Map instead when you can.
  */
@@ -28,13 +26,13 @@ export class Dictionary<TKey, TValue>
             this.RegisterNewKeyValuePair(key, value);
     }
 
-    protected MapNewValueToExistingKey(value, key): void
+    protected MapNewValueToExistingKey(value: TValue, key: TKey): void
     {
         let index = this.keys.indexOf(key);
         this.values[index] = value;
     }
 
-    protected RegisterNewKeyValuePair(key, value): void
+    protected RegisterNewKeyValuePair(key: TKey, value: TValue): void
     {
         this.keys.push(key);
         this.values.push(value);

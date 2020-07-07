@@ -883,53 +883,24 @@
         PIXISpriteEx: PIXISpriteEx
     });
 
-    var InputCode;
-    (function (InputCode) {
-        InputCode["tab"] = "tab";
-        InputCode["ok"] = "ok";
-        InputCode["enter"] = "ok";
-        InputCode["space"] = "ok";
-        InputCode["Z"] = "ok";
-        InputCode["shift"] = "shift";
-        InputCode["control"] = "control";
-        InputCode["alt"] = "control";
-        InputCode["escape"] = "escape";
-        InputCode["numpad0"] = "escape";
-        InputCode["insert"] = "escape";
-        InputCode["X"] = "escape";
-        InputCode["pageUp"] = "pageup";
-        InputCode["Q"] = "pageup";
-        InputCode["pageDown"] = "pagedown";
-        InputCode["W"] = "pagedown";
-        InputCode["leftArrow"] = "left";
-        InputCode["numpad4"] = "left";
-        InputCode["upArrow"] = "up";
-        InputCode["numpad8"] = "up";
-        InputCode["rightArrow"] = "right";
-        InputCode["numpad6"] = "right";
-        InputCode["downArrow"] = "down";
-        InputCode["numpad2"] = "down";
-        InputCode["f9"] = "debug";
-        InputCode["null"] = "null";
-    })(InputCode || (InputCode = {}));
-
     class Event {
         /** Throws an exception if a negative number of args are passed. */
         constructor(argCount = 0) {
+            this.callbacks = new Map;
             this.argCount = argCount;
             this.callbacks = new Map();
             this.invocationStr = '';
             this.funcToCall = null;
             this.callerName = 'caller';
-            this.CheckIfArgCountISValid(argCount);
+            this.CheckIfArgCountIsValid(argCount);
             this.SetupCallbackInvocationString();
         }
         // Getters
         get ArgCount() { return this.argCount; }
-        CheckIfArgCountISValid(argCount) {
+        CheckIfArgCountIsValid(argCount) {
             if (argCount < 0) {
                 let message = 'Cannot init CGT Event with a negative arg count.';
-                //alert(message);
+                alert(message);
                 throw message;
             }
         }
@@ -1036,6 +1007,36 @@
     }
     let InputSignaler = new SignalerImplementation();
 
+    var InputCode;
+    (function (InputCode) {
+        InputCode["tab"] = "tab";
+        InputCode["ok"] = "ok";
+        InputCode["enter"] = "ok";
+        InputCode["space"] = "ok";
+        InputCode["Z"] = "ok";
+        InputCode["shift"] = "shift";
+        InputCode["control"] = "control";
+        InputCode["alt"] = "control";
+        InputCode["escape"] = "escape";
+        InputCode["numpad0"] = "escape";
+        InputCode["insert"] = "escape";
+        InputCode["X"] = "escape";
+        InputCode["pageUp"] = "pageup";
+        InputCode["Q"] = "pageup";
+        InputCode["pageDown"] = "pagedown";
+        InputCode["W"] = "pagedown";
+        InputCode["leftArrow"] = "left";
+        InputCode["numpad4"] = "left";
+        InputCode["upArrow"] = "up";
+        InputCode["numpad8"] = "up";
+        InputCode["rightArrow"] = "right";
+        InputCode["numpad6"] = "right";
+        InputCode["downArrow"] = "down";
+        InputCode["numpad2"] = "down";
+        InputCode["f9"] = "debug";
+        InputCode["null"] = "null";
+    })(InputCode || (InputCode = {}));
+
     class InputObserver {
         constructor() {
             this.ListenForInputs();
@@ -1063,29 +1064,34 @@
     }
     InputObserver.Null = Object.freeze(new InputObserver());
 
-    var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-        function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-        return new (P || (P = Promise))(function (resolve, reject) {
-            function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-            function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-            function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-            step((generator = generator.apply(thisArg, _arguments || [])).next());
-        });
-    };
+    AttachInputSignalerToScenes();
+    function AttachInputSignalerToScenes() {
+        let oldSceneUpdate = Scene_Base.prototype.update;
+    }
+
     /**
      * Allows working with files in a browser-friendly manner.
      */
     class File {
         /**
-         * Asynchronously reads a file and calls a callback when it's done.
+         * Synchronously reads a file and returns its text.
          * @param path Relative to where the game's index.html file is.
          */
-        static Read(path, callback) {
-            return __awaiter(this, void 0, void 0, function* () {
-                yield fetch(path)
-                    .then(response => response.text())
-                    .then(responseText => callback(responseText));
-            });
+        static ReadSync(path) {
+            let req = new XMLHttpRequest();
+            req.open("GET", path, false);
+            req.send();
+            return req.responseText;
+        }
+        /**
+         * Asynchronously reads a file and executes a callback
+         * when its done.
+         * @param path Relative to where the game's index.html file is.
+         */
+        static Read(path, onFileReadFinished) {
+            fetch(path)
+                .then(response => response.text())
+                .then(onFileReadFinished);
         }
     }
 
@@ -1143,11 +1149,6 @@
     Font.Default = new Font("GameFont", 28, false);
     Font.Null = Object.freeze(new Font());
 
-    var Utils = /*#__PURE__*/Object.freeze({
-        __proto__: null,
-        GetScaleFactor: GetScaleFactor
-    });
-
     let Callbacks = SetupEvents();
     function SetupEvents() {
         let callbacks = {
@@ -1198,19 +1199,22 @@
         }
     }
 
+    var Utils = /*#__PURE__*/Object.freeze({
+        __proto__: null,
+        GetScaleFactor: GetScaleFactor,
+        Event: Event,
+        Callbacks: Callbacks
+    });
+
     let CGT = {
         version: 1.01,
-        path: "./_CGT1.6.x/",
         Core: {
-            path: "./_CGT1.6.x/CoreEngine/",
             Audio: Audio,
             Collections: Collections,
             Extensions: Extensions,
             Graphics: Graphics,
             IO: IO,
             Utils: Utils,
-            Event: Event,
-            Callbacks: Callbacks,
         },
     };
     // @ts-ignore
@@ -1232,13 +1236,9 @@
 
     */
     console.log(CGT);
-    /*
     let filePath = "data/BoDiSyPages/someTextFile.txt";
-    let File = CGT.Core.IO.File;
-    let fileText: string;
-
-    File.Read(filePath).then(txt => fileText);
+    let File$1 = CGT.Core.IO.File;
+    let fileText = File$1.ReadSync(filePath);
     console.log(fileText);
-    */
 
 }());

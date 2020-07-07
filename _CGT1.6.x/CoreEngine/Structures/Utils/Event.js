@@ -2,20 +2,21 @@ import { ArrayEx } from '../Extensions/ArrayEx';
 export class Event {
     /** Throws an exception if a negative number of args are passed. */
     constructor(argCount = 0) {
+        this.callbacks = new Map;
         this.argCount = argCount;
         this.callbacks = new Map();
         this.invocationStr = '';
         this.funcToCall = null;
         this.callerName = 'caller';
-        this.CheckIfArgCountISValid(argCount);
+        this.CheckIfArgCountIsValid(argCount);
         this.SetupCallbackInvocationString();
     }
     // Getters
     get ArgCount() { return this.argCount; }
-    CheckIfArgCountISValid(argCount) {
+    CheckIfArgCountIsValid(argCount) {
         if (argCount < 0) {
             let message = 'Cannot init CGT Event with a negative arg count.';
-            //alert(message);
+            alert(message);
             throw message;
         }
     }
@@ -74,4 +75,3 @@ export class Event {
         return '[object CGT.Core.Utils.Event]';
     }
 }
-;
