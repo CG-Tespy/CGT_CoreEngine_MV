@@ -1069,12 +1069,32 @@
         let oldSceneUpdate = Scene_Base.prototype.update;
     }
 
+    // Credit to Dr. Axel Rauschmayer for this
+    function MapToJSON(map) {
+        return JSON.stringify([...map]);
+    }
+    function JSONToMap(json) {
+        return new Map(JSON.parse(json));
+    }
+
     /**
      * Allows working with files in a browser-friendly manner.
      */
     class File {
+        static get FileKey() { return "CGTFiles"; }
+        static get FilesStored() { return this.filesStored; }
+        ;
+        static InitFromLocalStorage() {
+            // The files are stored in a json string in localStorage. We need to parse 
+            // and assign that upon startup.
+            let fileMapStr = localStorage.getItem(this.filesKey);
+            if (fileMapStr != null)
+                this.filesStored = JSONToMap(fileMapStr);
+            else
+                this.SyncToLocalStorage();
+        }
         /**
-         * Synchronously reads a file and returns its text.
+         * Synchronously reads a file on disk and returns its text.
          * @param path Relative to where the game's index.html file is.
          */
         static ReadSync(path) {
@@ -1084,7 +1104,7 @@
             return req.responseText;
         }
         /**
-         * Asynchronously reads a file and executes a callback
+         * Asynchronously reads a file on disk and executes a callback
          * when its done.
          * @param path Relative to where the game's index.html file is.
          */
@@ -1093,7 +1113,31 @@
                 .then(response => response.text())
                 .then(onFileReadFinished);
         }
+        /**
+         * Synchronously writes a "file" to browser storage with the passed key.
+         * If the key is already tied to a "file", said "file" gets overwritten.
+         */
+        static WriteBrowSync(key, contents) {
+            this.FilesStored.set(key, contents);
+            this.SyncToLocalStorage();
+        }
+        /** Syncs the local storage's CGT "files" with what this has. */
+        static SyncToLocalStorage() {
+            localStorage.setItem(this.filesKey, MapToJSON(this.FilesStored));
+        }
+        /**
+         * Synchronously reads a "file" from browser storage with the passed key.
+         * If there is no "file" tied to the key, you get an empty string.
+         */
+        static ReadBrowSync(key) {
+            let file = this.FilesStored.get(key);
+            return file || "";
+        }
     }
+    File.filesStored = new Map();
+    File.filesKey = "CGTFiles";
+
+    File.InitFromLocalStorage();
 
     var IO = /*#__PURE__*/Object.freeze({
         __proto__: null,
@@ -1203,7 +1247,9 @@
         __proto__: null,
         GetScaleFactor: GetScaleFactor,
         Event: Event,
-        Callbacks: Callbacks
+        Callbacks: Callbacks,
+        MapToJSON: MapToJSON,
+        JSONToMap: JSONToMap
     });
 
     let CGT = {
@@ -1233,6 +1279,7 @@
     Endless Illusion Software – http://endlessillusoft.com/
     Comficker - https://gist.github.com/comficker
     rob - https://stackoverflow.com/users/563532/rob
+    Dr. Axel Rauschmayer - https://2ality.com/
 
     */
     console.log(CGT);

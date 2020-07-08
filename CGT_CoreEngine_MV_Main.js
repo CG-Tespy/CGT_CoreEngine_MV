@@ -11,6 +11,7 @@ MinusGix
 Endless Illusion Software – http://endlessillusoft.com/
 Comficker - https://gist.github.com/comficker
 rob - https://stackoverflow.com/users/563532/rob
+Dr. Axel Rauschmayer - https://2ality.com/
 
 */
 import { CGT } from "./_CGT1.6.x/_CGT_CoreEngine_Setup";

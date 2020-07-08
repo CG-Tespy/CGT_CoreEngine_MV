@@ -470,17 +470,29 @@ declare namespace CGT
             class File
             {
                 /**
-                 * Synchronously reads a file and returns its text.
+                 * Synchronously reads a file on disk and returns its text.
                  * @param path Relative to where the game's index.html file is.
                  */
                 static ReadSync(path: string): string
 
                 /**
-                 * Asynchronously reads a file and executes a callback
+                 * Asynchronously reads a file on disk and executes a callback
                  * when its done.
                  * @param path Relative to where the game's index.html file is.
                  */
                 static Read(path: string, onFileReadFinished: (output: string) => void): void
+
+                /**
+                 * Synchronously writes a "file" to browser storage with the passed key.
+                 * If the key is already tied to a "file", said "file" gets overwritten.
+                 */
+                static WriteBrowSync(key: string, contents: string): void
+
+                /**
+                 * Synchronously reads a "file" from browser storage with the passed key.
+                 * If there is no "file" tied to the key, you get an empty string.
+                 */
+                static ReadBrowSync(key: string): string
 
             }
         }
@@ -589,6 +601,9 @@ declare namespace CGT
 
             function GetScaleFactor(firstWidth: number, firstHeight: number, 
                 secondWidth: number, secondHeight: number): number;
+
+            
+
         }
 
     }
