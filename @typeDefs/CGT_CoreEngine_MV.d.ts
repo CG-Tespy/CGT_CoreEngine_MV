@@ -1,9 +1,10 @@
 declare namespace CGT
 {
-    let version: number
-
+    
     namespace Core
     {
+        let version: number
+
         namespace Audio
         {
             enum SoundType 
@@ -223,6 +224,65 @@ declare namespace CGT
                 static SubjectAsType<T extends Function>(action: Game_Action, typeWanted: T): T
                 /** Returns this action's subject if the subject is an actor. Null otherwise. */
                 static SubjectAsActor(action: Game_Action): Game_Actor
+            }
+
+            namespace Items
+            {
+                class RPGItemEx
+                {
+
+                }
+
+                enum EffectCodes
+                {
+                    HPHeal = 11,
+                    MPHeal = 12,
+                    TPHeal = 13,
+                    AddState = 21,
+                    RemoveState = 22,
+                    AddBuff = 31,
+                    AddDebuff = 32,
+                    RemoveBuff = 33,
+                    RemoveDebuff = 34,
+                    SpecialEffect = 41,
+                    Grow = 42,
+                    LearnSkill = 43,
+                    CommonEvent = 44,
+                }
+
+                
+                class HealEffects
+                {
+                    hp: RPG.Effect[];
+                    mp: RPG.Effect[];
+                    tp: RPG.Effect[];
+
+                    /** Creates an instance of this from the effects of the passed item. */
+                    static OfItem(item: RPG.Item): HealEffects
+
+                    /**
+                     * Registers any legit healing effects in the array passed. Returns true if
+                     * any were legit, false otherwise.
+                     * @param effects 
+                     */
+                    RegisterMultiple(effects: RPG.Effect[]): Boolean
+
+                    /**
+                     * If the passed effect is a legit healing effect, it gets registered as the right
+                     * type in this instance, returning true. Returns false otherwise.
+                     */
+                    Register(eff: RPG.Effect): Boolean
+
+                    private IsLegitHealingEffect(effect: RPG.Effect)
+
+                    private static Codes: Readonly<number[]>;
+
+                    /** Whether or not this has any effects registered. */
+                    Any(): Boolean
+
+                    static Null: Readonly<HealEffects>;
+                    
+                }
             }
 
             class NumberEx
@@ -497,13 +557,20 @@ declare namespace CGT
             }
         }
 
+        namespace PluginCommands
+        {
+            type RawCommandFunc = (args: string[]) => any;
+
+            let commandMap: Map<string, RawCommandFunc>;
+            function Register(commandName: string, func: RawCommandFunc): void;
+        }
+
         namespace PluginParams
         {
             class PluginParamObjectFactory<TReal, TParsedRaw>
             {
                 static get ClassOfObjectCreated(): Function
                 
-                // @ts-ignore
                 get ClassOfObjectCreated(): any
 
                 protected paramToCreateFrom: string;
@@ -522,7 +589,7 @@ declare namespace CGT
                 protected ApplyStrings(): void
                 protected ApplyCustomValues(): void 
 
-                CreateObjectsFrom(stringifiedParamArr): TReal[]
+                CreateObjectsFrom(stringifiedParamArr: string): TReal[]
 
                 protected ConvertParamStringsToObjects(paramStrings): TReal[]
 

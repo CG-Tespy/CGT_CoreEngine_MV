@@ -127,6 +127,131 @@
         Object.assign(PIXI.Sprite.prototype, pixiSpriteChanges);
     })();
 
+    class ArrayEx {
+        static Remove(arr, toRemove) {
+            let index = arr.indexOf(toRemove);
+            if (index >= 0)
+                arr.splice(index, 1);
+        }
+        static Copy(arr) {
+            return arr.slice();
+        }
+        static Filter(arr, test, context) {
+            context = context || arr; // context is optional
+            let result = [];
+            for (let i = 0; i < arr.length; i++) {
+                let item = arr[i];
+                let passedTest = test.call(context, item) === true;
+                if (passedTest)
+                    result.push(item);
+            }
+            return result;
+        }
+        static Clear(arr) {
+            while (arr.length > 0)
+                arr.shift();
+        }
+    }
+
+    class Event {
+        /** Throws an exception if a negative number of args are passed. */
+        constructor(argCount = 0) {
+            this.callbacks = new Map;
+            this.argCount = argCount;
+            this.callbacks = new Map();
+            this.invocationStr = '';
+            this.funcToCall = null;
+            this.callerName = 'caller';
+            this.CheckIfArgCountIsValid(argCount);
+            this.SetupCallbackInvocationString();
+        }
+        // Getters
+        get ArgCount() { return this.argCount; }
+        CheckIfArgCountIsValid(argCount) {
+            if (argCount < 0) {
+                let message = 'Cannot init CGT Event with a negative arg count.';
+                alert(message);
+                throw message;
+            }
+        }
+        AddListener(func, caller = null) {
+            if (this.callbacks.get(caller) == null)
+                this.callbacks.set(caller, []);
+            this.callbacks.get(caller).push(func);
+        }
+        RemoveListener(func, caller = null) {
+            if (this.callbacks.get(caller) == null)
+                return;
+            let callbackArr = this.callbacks.get(caller);
+            ArrayEx.Remove(callbackArr, func);
+        }
+        /**
+         * Invokes all callbacks registered under this event. Throws an exception if an inappropriate
+         * number of args is passed.
+         * */
+        Invoke(...args) {
+            // Safety
+            if (args.length != this.ArgCount) {
+                let message = `ERROR: call to Event invoke() passed wrong amount of arguments. \
+            Amount passed: ${args.length} Amount Needed: ${this.ArgCount}`;
+                //alert(message);
+                throw message;
+            }
+            // Going through the callers...
+            let callers = Array.from(this.callbacks.keys());
+            for (let i = 0; i < callers.length; i++) {
+                let caller = callers[i];
+                // Go through all the funcs registered under the caller, and execute them one by 
+                // one with this object's invocation string.
+                let toExecute = this.callbacks.get(caller);
+                for (let i = 0; i < toExecute.length; i++) {
+                    this.funcToCall = toExecute[i];
+                    eval(this.invocationStr);
+                }
+            }
+        }
+        SetupCallbackInvocationString() {
+            this.invocationStr = 'this.funcToCall.call(' + this.callerName;
+            if (this.ArgCount > 0)
+                this.invocationStr += ', ';
+            else
+                this.invocationStr += ')';
+            for (let i = 0; i < this.ArgCount; i++) {
+                let argString = 'arguments[' + i + ']';
+                if (i == this.ArgCount - 1) // Are we at the last arg?
+                    argString += ');';
+                else
+                    argString += ', ';
+                this.invocationStr += argString;
+            }
+        }
+        toString() {
+            return '[object CGT.Core.Utils.Event]';
+        }
+    }
+
+    let oldDataManagerOnLoad = DataManager.onLoad;
+    class DataManagerExtensions {
+        constructor() {
+            this.filesLoaded = 0;
+            this.databaseLoaded = 'databaseLoaded';
+            this.DoneLoading = new Event();
+        }
+        get FilesToLoad() {
+            // @ts-ignore
+            return this._databaseFiles.length;
+        }
+        ;
+        onLoad(object) {
+            oldDataManagerOnLoad.call(this, object);
+            this.filesLoaded++;
+            if (this.filesLoaded == this.FilesToLoad)
+                this.DoneLoading.Invoke();
+        }
+    }
+    let extensions = new DataManagerExtensions();
+    Object.assign(DataManager, extensions);
+
     var SoundType;
     (function (SoundType) {
         SoundType["bgm"] = "bgm";
@@ -267,11 +392,11 @@
     Sound.DefaultPan = 0;
     Sound.Null = Object.freeze(new Sound("???", SoundType.bgm, 0, 0, 0));
 
-    var Audio = /*#__PURE__*/Object.freeze({
+    var Audio = {
         __proto__: null,
         Sound: Sound,
         get SoundType () { return SoundType; }
-    });
+    };
 
     class CGTIterator {
         constructor(iteratee) {
@@ -332,32 +457,6 @@
                 throw 'isOfExactType only accepts function or class args.';
             }
             return obj.constructor === input;
-        }
-    }
-
-    class ArrayEx {
-        static Remove(arr, toRemove) {
-            let index = arr.indexOf(toRemove);
-            if (index >= 0)
-                arr.splice(index, 1);
-        }
-        static Copy(arr) {
-            return arr.slice();
-        }
-        static Filter(arr, test, context) {
-            context = context || arr; // context is optional
-            let result = [];
-            for (let i = 0; i < arr.length; i++) {
-                let item = this[i];
-                let passedTest = test.call(context, item) === true;
-                if (passedTest)
-                    result.push(item);
-            }
-            return result;
-        }
-        static Clear(arr) {
-            while (arr.length > 0)
-                arr.shift();
         }
     }
 
@@ -521,14 +620,14 @@
         }
     }
 
-    var Collections = /*#__PURE__*/Object.freeze({
+    var Collections = {
         __proto__: null,
         ArrayIterator: ArrayIterator,
         CGTIterator: CGTIterator,
         DestructibleCache: DestructibleCache,
         Dictionary: Dictionary,
         TightArray: TightArray
-    });
+    };
 
     /**
      * To help create custom types out of Plugin Params.
@@ -774,11 +873,11 @@
         Color.factory = new ColorFactory();
     }
 
-    var Graphics = /*#__PURE__*/Object.freeze({
+    var Graphics = {
         __proto__: null,
         Color: Color,
         ColorFactory: ColorFactory
-    });
+    };
 
     class BitmapEx {
         /**
@@ -873,92 +972,104 @@
         }
     }
 
-    var Extensions = /*#__PURE__*/Object.freeze({
+    var EffectCodes;
+    (function (EffectCodes) {
+        EffectCodes[EffectCodes["HPHeal"] = 11] = "HPHeal";
+        EffectCodes[EffectCodes["MPHeal"] = 12] = "MPHeal";
+        EffectCodes[EffectCodes["TPHeal"] = 13] = "TPHeal";
+        EffectCodes[EffectCodes["AddState"] = 21] = "AddState";
+        EffectCodes[EffectCodes["RemoveState"] = 22] = "RemoveState";
+        EffectCodes[EffectCodes["AddBuff"] = 31] = "AddBuff";
+        EffectCodes[EffectCodes["AddDebuff"] = 32] = "AddDebuff";
+        EffectCodes[EffectCodes["RemoveBuff"] = 33] = "RemoveBuff";
+        EffectCodes[EffectCodes["RemoveDebuff"] = 34] = "RemoveDebuff";
+        EffectCodes[EffectCodes["SpecialEffect"] = 41] = "SpecialEffect";
+        EffectCodes[EffectCodes["Grow"] = 42] = "Grow";
+        EffectCodes[EffectCodes["LearnSkill"] = 43] = "LearnSkill";
+        EffectCodes[EffectCodes["CommonEvent"] = 44] = "CommonEvent";
+    })(EffectCodes || (EffectCodes = {}));
+
+    class HealEffects {
+        constructor() {
+            this.hp = [];
+            this.mp = [];
+            this.tp = [];
+        }
+        /** Creates an instance of this from the effects of the passed item. */
+        static OfItem(item) {
+            let healEffects = new HealEffects();
+            healEffects.RegisterMultiple(item.effects);
+            return healEffects;
+        }
+        /**
+         * Registers any legit healing effects in the array passed. Returns true if
+         * any were legit, false otherwise.
+         * @param effects
+         */
+        RegisterMultiple(effects) {
+            for (const eff of effects)
+                this.Register(eff);
+            return this.Any();
+        }
+        /**
+         * If the passed effect is a legit healing effect, it gets registered as the right
+         * type in this instance, returning true. Returns false otherwise.
+         */
+        Register(eff) {
+            if (this.IsLegitHealingEffect(eff)) {
+                switch (eff.code) {
+                    case EffectCodes.HPHeal:
+                        this.hp.push(eff);
+                        break;
+                    case EffectCodes.MPHeal:
+                        this.mp.push(eff);
+                        break;
+                    case EffectCodes.TPHeal:
+                        this.tp.push(eff);
+                        break;
+                    default:
+                        throw Error(`Did not account for healing code ${eff.code}`);
+                }
+                return true;
+            }
+            return false;
+        }
+        IsLegitHealingEffect(effect) {
+            let hasHealingCode = HealEffects.Codes.includes(effect.code);
+            let percentHealValue = effect.value1;
+            let flatHealValue = effect.value2;
+            let doesAnyHealing = percentHealValue > 0 || flatHealValue > 0;
+            let doesNoDamage = !(percentHealValue < 0 || flatHealValue < 0);
+            return hasHealingCode && doesAnyHealing && doesNoDamage;
+        }
+        /** Whether or not this has any effects registered. */
+        Any() {
+            return this.hp.length > 0 || this.mp.length > 0 || this.tp.length > 0;
+        }
+    }
+    HealEffects.Codes = Object.freeze([EffectCodes.HPHeal, EffectCodes.MPHeal, EffectCodes.TPHeal]);
+    HealEffects.Null = Object.freeze(new HealEffects());
+
+    class RPGItemEx {
+    }
+
+    var _RPG_Item_Setup = {
         __proto__: null,
+        get EffectCodes () { return EffectCodes; },
+        HealEffects: HealEffects,
+        RPGItemEx: RPGItemEx
+    };
+
+    var Extensions = {
+        __proto__: null,
+        Items: _RPG_Item_Setup,
         ArrayEx: ArrayEx,
         BitmapEx: BitmapEx,
         Game_ActionEx: Game_ActionEx,
         NumberEx: NumberEx,
         ObjectEx: ObjectEx,
         PIXISpriteEx: PIXISpriteEx
-    });
-
-    class Event {
-        /** Throws an exception if a negative number of args are passed. */
-        constructor(argCount = 0) {
-            this.callbacks = new Map;
-            this.argCount = argCount;
-            this.callbacks = new Map();
-            this.invocationStr = '';
-            this.funcToCall = null;
-            this.callerName = 'caller';
-            this.CheckIfArgCountIsValid(argCount);
-            this.SetupCallbackInvocationString();
-        }
-        // Getters
-        get ArgCount() { return this.argCount; }
-        CheckIfArgCountIsValid(argCount) {
-            if (argCount < 0) {
-                let message = 'Cannot init CGT Event with a negative arg count.';
-                alert(message);
-                throw message;
-            }
-        }
-        AddListener(func, caller = null) {
-            if (this.callbacks.get(caller) == null)
-                this.callbacks.set(caller, []);
-            this.callbacks.get(caller).push(func);
-        }
-        RemoveListener(func, caller = null) {
-            if (this.callbacks.get(caller) == null)
-                return;
-            let callbackArr = this.callbacks.get(caller);
-            ArrayEx.Remove(callbackArr, func);
-        }
-        /**
-         * Invokes all callbacks registered under this event. Throws an exception if an inappropriate
-         * number of args is passed.
-         * */
-        Invoke(...args) {
-            // Safety
-            if (args.length != this.ArgCount) {
-                let message = `ERROR: call to Event invoke() passed wrong amount of arguments. \
-            Amount passed: ${args.length} Amount Needed: ${this.ArgCount}`;
-                //alert(message);
-                throw message;
-            }
-            // Going through the callers...
-            let callers = Array.from(this.callbacks.keys());
-            for (let i = 0; i < callers.length; i++) {
-                let caller = callers[i];
-                // Go through all the funcs registered under the caller, and execute them one by 
-                // one with this object's invocation string.
-                let toExecute = this.callbacks.get(caller);
-                for (let i = 0; i < toExecute.length; i++) {
-                    this.funcToCall = toExecute[i];
-                    eval(this.invocationStr);
-                }
-            }
-        }
-        SetupCallbackInvocationString() {
-            this.invocationStr = 'this.funcToCall.call(' + this.callerName;
-            if (this.ArgCount > 0)
-                this.invocationStr += ', ';
-            else
-                this.invocationStr += ')';
-            for (let i = 0; i < this.ArgCount; i++) {
-                let argString = 'arguments[' + i + ']';
-                if (i == this.ArgCount - 1) // Are we at the last arg?
-                    argString += ');';
-                else
-                    argString += ', ';
-                this.invocationStr += argString;
-            }
-        }
-        toString() {
-            return '[object CGT.Core.Utils.Event]';
-        }
-    }
+    };
 
     class SignalerImplementation {
         constructor() {
@@ -1139,10 +1250,47 @@
 
     File.InitFromLocalStorage();
 
-    var IO = /*#__PURE__*/Object.freeze({
+    var IO = {
         __proto__: null,
         File: File
-    });
+    };
+
+    // Maps the command names to the functions that take the raw args
+    let commandMap = new Map();
+    function HookUpCommandMapToInterpreter() {
+        let oldPluginCommand = Game_Interpreter.prototype.pluginCommand;
+        Game_Interpreter.prototype.pluginCommand = CGTPluginCommand;
+        function CGTPluginCommand(commandName, args) {
+            oldPluginCommand.call(this, commandName, args);
+            if (CommandIsInMap(commandName))
+                ExecuteCommandFromMap(commandName, args);
+        }
+        function CommandIsInMap(commandName) {
+            return commandMap.get(commandName) != null;
+        }
+        function ExecuteCommandFromMap(commandName, args) {
+            let commandFunc = commandMap.get(commandName);
+            commandFunc.call(this, args);
+        }
+    }
+
+    function RegisterPluginCommand(commandName, commandFunc) {
+        let commandMap = CGT.Core.PluginCommands.commandMap;
+        commandMap.set(commandName, commandFunc);
+    }
+
+    HookUpCommandMapToInterpreter();
+
+    var PluginCommands = {
+        __proto__: null,
+        Register: RegisterPluginCommand,
+        commandMap: commandMap
+    };
+
+    var PluginParams = {
+        __proto__: null,
+        PluginParamObjectFactory: PluginParamObjectFactory
+    };
 
     class Font {
         constructor(face, size, isItalic) {
@@ -1243,35 +1391,35 @@
         }
     }
 
-    var Utils = /*#__PURE__*/Object.freeze({
+    var Utils = {
         __proto__: null,
         GetScaleFactor: GetScaleFactor,
         Event: Event,
         Callbacks: Callbacks,
         MapToJSON: MapToJSON,
         JSONToMap: JSONToMap
-    });
+    };
 
-    let CGT = {
-        version: 1.01,
+    let CGT$1 = {
         Core: {
+            version: 10101,
             Audio: Audio,
             Collections: Collections,
             Extensions: Extensions,
             Graphics: Graphics,
             IO: IO,
+            PluginCommands: PluginCommands,
+            PluginParams: PluginParams,
             Utils: Utils,
         },
     };
-    // @ts-ignore
-    window.CGT = CGT;
 
     /*:
      * @plugindesc Mainly contains utility code that other CGT scripts rely on.
      * @author CG-Tespy – https://github.com/CG-Tespy
-     * @help This is version 0.67 of this plugin. For RMMV versions 1.5.1 and above.
+     * @help This is version 1.01.01 of this plugin. Tested with RMMV version 1.6.2.
 
-    Make sure to credit me (and any of this plugin's contributing coders)
+    Please make sure to credit me (and any of this plugin's contributing coders)
     if you're using this plugin in your game (include the names and webpage links).
 
     Other code contributors:
@@ -1282,10 +1430,9 @@
     Dr. Axel Rauschmayer - https://2ality.com/
 
     */
-    console.log(CGT);
-    let filePath = "data/BoDiSyPages/someTextFile.txt";
-    let File$1 = CGT.Core.IO.File;
-    let fileText = File$1.ReadSync(filePath);
-    console.log(fileText);
+    let coreEngine = {
+        CGT: CGT$1,
+    };
+    Object.assign(window, coreEngine);
 
 }());

@@ -2,3 +2,4 @@
 import "./BitmapExtensions";
 import "./Game_ActionExtensions";
 import "./PIXISpriteExtensions";
+import "./DataManagerExtensions";
