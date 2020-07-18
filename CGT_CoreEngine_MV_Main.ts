@@ -1,9 +1,9 @@
 /*:
  * @plugindesc Mainly contains utility code that other CGT scripts rely on.
  * @author CG-Tespy – https://github.com/CG-Tespy
- * @help This is version 0.67 of this plugin. For RMMV versions 1.5.1 and above.
+ * @help This is version 1.01.01 of this plugin. Tested with RMMV version 1.6.2.
 
-Make sure to credit me (and any of this plugin's contributing coders)
+Please make sure to credit me (and any of this plugin's contributing coders)
 if you're using this plugin in your game (include the names and webpage links).
 
 Other code contributors:
@@ -15,11 +15,12 @@ Dr. Axel Rauschmayer - https://2ality.com/
 
 */
 
-import { CGT } from "./_CGT1.6.x/_CGT_CoreEngine_Setup";
-console.log(CGT);
+import { CGT } from "./_MainSource/_CGT_CoreEngine_Setup";
 
-let filePath = "data/BoDiSyPages/someTextFile.txt";
-let File = CGT.Core.IO.File;
-let fileText = File.ReadSync(filePath);
+let coreEngine = 
+{
+    CGT: CGT,
+};
 
-console.log(fileText);
+Object.assign(window, coreEngine);
+

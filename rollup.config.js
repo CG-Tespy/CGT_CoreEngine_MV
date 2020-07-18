@@ -4,8 +4,9 @@ export default {
 	input: "./CGT_CoreEngine_MV_Main.js",
 	output: 
 	{
-		file: "./CGT_CoreEngine_MV_Main_Bundle.js",
-		format: 'iife'
+		file: "./CGT_CoreEngine_MV.js",
+		format: 'iife',
+		freeze: false,
 	},
 
 	plugins: [
