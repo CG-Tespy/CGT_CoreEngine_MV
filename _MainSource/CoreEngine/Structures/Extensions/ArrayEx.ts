@@ -1,3 +1,5 @@
+export type ArrayFindPredicate<T> = (element: T, index?: number, arr?: T[] | Readonly<T>) => boolean;
+
 export class ArrayEx
 {
     static Remove(arr: Array<any>, toRemove: any): void
@@ -57,5 +59,19 @@ export class ArrayEx
                 return true;
 
         return false;
+    }
+
+    static Find<T>(arr: Array<T> | Readonly<Array<T>>, 
+        predicate: ArrayFindPredicate<T>, 
+        thisArg: any = null): T
+    {
+        for (let index = 0; index < arr.length; index++)
+        {
+            let element = arr[index];
+            if (predicate.call(thisArg, element, index, arr))
+                return element;
+        }
+
+        return undefined;
     }
 }

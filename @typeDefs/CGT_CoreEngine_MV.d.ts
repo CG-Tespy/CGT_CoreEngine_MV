@@ -192,23 +192,34 @@ declare namespace CGT
                 /** Returns a shallow copy of the passed array. */
                 static Copy(arr: Array<any>): Array<any>
                 /** 
-                 * A replacement for the Array.filter function, since that function isn't 
-                 * supported in MV 1.5.1.
+                 * An implementation of the Array.prototype.filter function, for versions
+                 * of MV that don't support the official one.
                  */
                 static Filter(arr: Array<any>, test: Function, context: any): Array<any>
                 static Clear(arr: Array<any>): void
                 /** 
-                 * A replacement for the Array.from function, since that function isn't 
-                 * supported in MV 1.5.1.
+                 * An implementation of the Array.from function, for versions
+                 * of MV that don't support the official one.
                  */
                 static From<T>(iterable: Iterable<T>): T[];
 
                 /** 
-                 * A replacement for the Array.includes function, since that function isn't 
-                 * supported in MV 1.5.1.
+                 * An implementation of the Array.prototype.includes function, for versions
+                 * of MV that don't support the official one.
                  */
                 static Includes(arr: Array<any>, item: any): boolean
+
+                /** 
+                 * An implementation of the Array.prototype.find function, for versions
+                 * of MV that don't support the official one.
+                 */
+                static Find<T>(arr: Array<T> | Readonly<Array<T>>, 
+                    predicate: ArrayFindPredicate<T>, 
+                    thisArg?: any): T
+
             }
+
+            type ArrayFindPredicate<T> = (element: T, index?: number, arr?: T[] | Readonly<T>) => boolean;
 
             class BitmapEx
             {
