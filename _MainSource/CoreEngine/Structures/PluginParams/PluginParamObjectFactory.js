@@ -1,47 +1,59 @@
 /**
  * To help create custom types out of Plugin Params.
  */
-export class PluginParamObjectFactory {
-    static get ClassOfObjectCreated() { return Object; }
-    // @ts-ignore
-    get ClassOfObjectCreated() { return this.constructor.ClassOfObjectCreated; }
-    CreateObjectFrom(param) {
+var PluginParamObjectFactory = /** @class */ (function () {
+    function PluginParamObjectFactory() {
+    }
+    Object.defineProperty(PluginParamObjectFactory, "ClassOfObjectCreated", {
+        get: function () { return Object; },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(PluginParamObjectFactory.prototype, "ClassOfObjectCreated", {
+        // @ts-ignore
+        get: function () { return this.constructor.ClassOfObjectCreated; },
+        enumerable: false,
+        configurable: true
+    });
+    PluginParamObjectFactory.prototype.CreateObjectFrom = function (param) {
         this.paramToCreateFrom = param;
         this.ParseParamOnce();
         this.baseObject = this.CreateBaseObject();
         this.ApplyParamValuesToBaseObject();
         return this.baseObject;
-    }
-    ParseParamOnce() {
+    };
+    PluginParamObjectFactory.prototype.ParseParamOnce = function () {
         this.parsedParam = JSON.parse(this.paramToCreateFrom);
-    }
-    CreateBaseObject() {
+    };
+    PluginParamObjectFactory.prototype.CreateBaseObject = function () {
         return new this.ClassOfObjectCreated();
-    }
-    ApplyParamValuesToBaseObject() {
+    };
+    PluginParamObjectFactory.prototype.ApplyParamValuesToBaseObject = function () {
         this.ApplyPrimitiveValues();
         this.ApplyCustomValues();
-    }
-    ApplyPrimitiveValues() {
+    };
+    PluginParamObjectFactory.prototype.ApplyPrimitiveValues = function () {
         this.ApplyBooleans();
         this.ApplyNumbers();
         this.ApplyStrings();
-    }
-    ApplyBooleans() { }
-    ApplyNumbers() { }
-    ApplyStrings() { }
-    ApplyCustomValues() { }
-    CreateObjectsFrom(stringifiedParamArr) {
-        let inputAsStringArr = JSON.parse(stringifiedParamArr);
+    };
+    PluginParamObjectFactory.prototype.ApplyBooleans = function () { };
+    PluginParamObjectFactory.prototype.ApplyNumbers = function () { };
+    PluginParamObjectFactory.prototype.ApplyStrings = function () { };
+    PluginParamObjectFactory.prototype.ApplyCustomValues = function () { };
+    PluginParamObjectFactory.prototype.CreateObjectsFrom = function (stringifiedParamArr) {
+        var inputAsStringArr = JSON.parse(stringifiedParamArr);
         return this.ConvertParamStringsToObjects(inputAsStringArr);
-    }
-    ConvertParamStringsToObjects(paramStrings) {
-        let objects = [];
-        for (let i = 0; i < paramStrings.length; i++) {
-            let unparsedParam = paramStrings[i];
-            let createdObject = this.CreateObjectFrom(unparsedParam);
+    };
+    PluginParamObjectFactory.prototype.ConvertParamStringsToObjects = function (paramStrings) {
+        var objects = [];
+        for (var i = 0; i < paramStrings.length; i++) {
+            var unparsedParam = paramStrings[i];
+            var createdObject = this.CreateObjectFrom(unparsedParam);
             objects.push(createdObject);
         }
         return objects;
-    }
-}
+    };
+    return PluginParamObjectFactory;
+}());
+export { PluginParamObjectFactory };

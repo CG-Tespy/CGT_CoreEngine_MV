@@ -1,7 +1,13 @@
 'use strict';
-export class CGTIterator {
-    constructor(iteratee) {
+var CGTIterator = /** @class */ (function () {
+    function CGTIterator(iteratee) {
         this.iteratee = iteratee;
     }
-    get Value() { return this.value; }
-}
+    Object.defineProperty(CGTIterator.prototype, "Value", {
+        get: function () { return this.value; },
+        enumerable: false,
+        configurable: true
+    });
+    return CGTIterator;
+}());
+export { CGTIterator };

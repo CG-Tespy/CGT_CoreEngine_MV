@@ -1,10 +1,12 @@
 import { ArrayEx } from './ArrayEx';
-export class BitmapEx {
+var BitmapEx = /** @class */ (function () {
+    function BitmapEx() {
+    }
     /**
      * Add a callback function that will be called when the bitmap is loaded.
      * Author: MinusGix
      */
-    AddLoadListener(bitmap, listener) {
+    BitmapEx.prototype.AddLoadListener = function (bitmap, listener) {
         if (!bitmap.isReady()) {
             // @ts-ignore
             bitmap._loadListeners.push(listener);
@@ -12,24 +14,26 @@ export class BitmapEx {
         else {
             listener(bitmap);
         }
-    }
-    RemoveLoadListener(bitmap, listener) {
+    };
+    BitmapEx.prototype.RemoveLoadListener = function (bitmap, listener) {
         // @ts-ignore
         ArrayEx.Remove(bitmap._loadListeners, listener);
-    }
-    HasLoadListener(bitmap, listener) {
+    };
+    BitmapEx.prototype.HasLoadListener = function (bitmap, listener) {
         // @ts-ignore
-        return bitmap._loadListeners.includes(listener);
-    }
+        return ArrayEx.Includes(bitmap._loadListeners, listener);
+    };
     /**
      * Returns a resized version of the bitmap (if it is ready). Note that
      * the aspect ratio may not be the same, based on the passed width and height.
      */
-    Resized(bitmap, width, height) {
+    BitmapEx.prototype.Resized = function (bitmap, width, height) {
         if (!bitmap.isReady())
             return;
         var newBitmap = new Bitmap(width, height);
         newBitmap.blt(bitmap, 0, 0, bitmap.width, bitmap.height, 0, 0, width, height);
         return newBitmap;
-    }
-}
+    };
+    return BitmapEx;
+}());
+export { BitmapEx };

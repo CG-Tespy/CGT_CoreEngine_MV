@@ -15,7 +15,7 @@ Dr. Axel Rauschmayer - https://2ality.com/
 
 */
 import { CGT } from "./_MainSource/_CGT_CoreEngine_Setup";
-let coreEngine = {
+var coreEngine = {
     CGT: CGT,
 };
 Object.assign(window, coreEngine);

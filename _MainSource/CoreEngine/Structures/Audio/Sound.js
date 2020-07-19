@@ -2,16 +2,16 @@
 import { SoundType } from './SoundType';
 import { NumberEx } from '../Extensions/NumberEx';
 function AlertAboutPlayingNullSoundType() {
-    let errMessage = "Cannot play null sound type!";
+    var errMessage = "Cannot play null sound type!";
     alert(errMessage);
 }
 /**
  * Adapted from the Sound Object in the RMMV Script Call List from the RPGMaker.net Discord server.
  * Makes it easier to work with sound files in MV.
 */
-export class Sound {
+var Sound = /** @class */ (function () {
     // Methods
-    constructor(fileName, type, volume, pitch, pan) {
+    function Sound(fileName, type, volume, pitch, pan) {
         this.type = type;
         this.volume = volume;
         this.pitch = pitch;
@@ -29,73 +29,95 @@ export class Sound {
         this.Pitch = pitch || Sound.DefaultPitch;
         this.Pan = pan || Sound.DefaultPan;
     }
-    // Getters
-    get Name() { return this.name; }
-    get Type() { return this.type; }
-    get Volume() { return this.volume; }
-    get Pitch() { return this.pitch; }
-    get Pan() { return this.pan; }
-    // Setters
-    set Name(value) {
-        this.name = value;
-        this.RemoveExtensionFromName();
-        this.audioParams.name = this.name;
-    }
-    set Type(value) { this.type = value; }
-    // The volume, pitch, and pan setters keep the values in valid ranges.
-    set Volume(value) {
-        this.volume = NumberEx.Clamp(value, Sound.MinVolume, Sound.MaxVolume);
-        this.audioParams.volume = this.volume;
-    }
-    set Pitch(value) {
-        this.pitch = NumberEx.Clamp(value, Sound.MinPitch, Sound.MaxPitch);
-        this.audioParams.pitch = this.pitch;
-    }
-    set Pan(value) {
-        this.pan = NumberEx.Clamp(value, Sound.MinPan, Sound.MaxPan);
-        this.audioParams.pan = this.pan;
-    }
-    Play() {
-        let handlePlayingSound = Sound.soundPlayers.get(this.Type);
+    Object.defineProperty(Sound.prototype, "Name", {
+        // Getters
+        get: function () { return this.name; },
+        // Setters
+        set: function (value) {
+            this.name = value;
+            this.RemoveExtensionFromName();
+            this.audioParams.name = this.name;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Sound.prototype, "Type", {
+        get: function () { return this.type; },
+        set: function (value) { this.type = value; },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Sound.prototype, "Volume", {
+        get: function () { return this.volume; },
+        // The volume, pitch, and pan setters keep the values in valid ranges.
+        set: function (value) {
+            this.volume = NumberEx.Clamp(value, Sound.MinVolume, Sound.MaxVolume);
+            this.audioParams.volume = this.volume;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Sound.prototype, "Pitch", {
+        get: function () { return this.pitch; },
+        set: function (value) {
+            this.pitch = NumberEx.Clamp(value, Sound.MinPitch, Sound.MaxPitch);
+            this.audioParams.pitch = this.pitch;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Sound.prototype, "Pan", {
+        get: function () { return this.pan; },
+        set: function (value) {
+            this.pan = NumberEx.Clamp(value, Sound.MinPan, Sound.MaxPan);
+            this.audioParams.pan = this.pan;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Sound.prototype.Play = function () {
+        var handlePlayingSound = Sound.soundPlayers.get(this.Type);
         handlePlayingSound(this.audioParams);
-    }
-    RemoveExtensionFromName() {
+    };
+    Sound.prototype.RemoveExtensionFromName = function () {
         if (this.HasExtensionInName()) {
-            let extensionIndex = this.FindExtensionIndex();
+            var extensionIndex = this.FindExtensionIndex();
             // Don't use the setter here; it'd cause infinite recursion.
             this.name = this.name.substring(0, extensionIndex);
         }
-    }
-    HasExtensionInName() {
+    };
+    Sound.prototype.HasExtensionInName = function () {
         return this.FindExtensionIndex() >= 0;
-    }
-    FindExtensionIndex() {
-        let extensionStartingCharacter = '.';
+    };
+    Sound.prototype.FindExtensionIndex = function () {
+        var extensionStartingCharacter = '.';
         return this.Name.indexOf(extensionStartingCharacter);
-    }
-    Copy() {
-        let copy = new Sound(this.Name, this.Type, this.Volume, this.Pitch, this.Pan);
+    };
+    Sound.prototype.Copy = function () {
+        var copy = new Sound(this.Name, this.Type, this.Volume, this.Pitch, this.Pan);
         return copy;
-    }
-    toString() {
+    };
+    Sound.prototype.toString = function () {
         return '[object CGT.Sound]';
-    }
-}
-Sound.soundPlayers = new Map([
-    [SoundType.bgm, AudioManager.playBgm.bind(AudioManager)],
-    [SoundType.bgs, AudioManager.playBgs.bind(AudioManager)],
-    [SoundType.me, AudioManager.playMe.bind(AudioManager)],
-    [SoundType.se, AudioManager.playSe.bind(AudioManager)],
-    [SoundType.null, AlertAboutPlayingNullSoundType]
-]);
-Sound.MinVolume = 0;
-Sound.MaxVolume = 100;
-Sound.DefaultVolume = 50;
-Sound.MinPitch = 50;
-Sound.MaxPitch = 150;
-Sound.DefaultPitch = 100;
-Sound.MinPan = -100;
-Sound.MaxPan = 100;
-Sound.DefaultPan = 0;
-Sound.Null = Object.freeze(new Sound("???", SoundType.bgm, 0, 0, 0));
+    };
+    Sound.soundPlayers = new Map([
+        [SoundType.bgm, AudioManager.playBgm.bind(AudioManager)],
+        [SoundType.bgs, AudioManager.playBgs.bind(AudioManager)],
+        [SoundType.me, AudioManager.playMe.bind(AudioManager)],
+        [SoundType.se, AudioManager.playSe.bind(AudioManager)],
+        [SoundType.null, AlertAboutPlayingNullSoundType]
+    ]);
+    Sound.MinVolume = 0;
+    Sound.MaxVolume = 100;
+    Sound.DefaultVolume = 50;
+    Sound.MinPitch = 50;
+    Sound.MaxPitch = 150;
+    Sound.DefaultPitch = 100;
+    Sound.MinPan = -100;
+    Sound.MaxPan = 100;
+    Sound.DefaultPan = 0;
+    Sound.Null = Object.freeze(new Sound("???", SoundType.bgm, 0, 0, 0));
+    return Sound;
+}());
+export { Sound };
 ;

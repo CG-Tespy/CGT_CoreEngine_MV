@@ -1,7 +1,8 @@
 import { ArrayEx } from '../Extensions/ArrayEx';
-export class Event {
+var Event = /** @class */ (function () {
     /** Throws an exception if a negative number of args are passed. */
-    constructor(argCount = 0) {
+    function Event(argCount) {
+        if (argCount === void 0) { argCount = 0; }
         this.callbacks = new Map;
         this.argCount = argCount;
         this.callbacks = new Map();
@@ -11,67 +12,78 @@ export class Event {
         this.CheckIfArgCountIsValid(argCount);
         this.SetupCallbackInvocationString();
     }
-    // Getters
-    get ArgCount() { return this.argCount; }
-    CheckIfArgCountIsValid(argCount) {
+    Object.defineProperty(Event.prototype, "ArgCount", {
+        // Getters
+        get: function () { return this.argCount; },
+        enumerable: false,
+        configurable: true
+    });
+    Event.prototype.CheckIfArgCountIsValid = function (argCount) {
         if (argCount < 0) {
-            let message = 'Cannot init CGT Event with a negative arg count.';
+            var message = 'Cannot init CGT Event with a negative arg count.';
             alert(message);
             throw message;
         }
-    }
-    AddListener(func, caller = null) {
+    };
+    Event.prototype.AddListener = function (func, caller) {
+        if (caller === void 0) { caller = null; }
         if (this.callbacks.get(caller) == null)
             this.callbacks.set(caller, []);
         this.callbacks.get(caller).push(func);
-    }
-    RemoveListener(func, caller = null) {
+    };
+    Event.prototype.RemoveListener = function (func, caller) {
+        if (caller === void 0) { caller = null; }
         if (this.callbacks.get(caller) == null)
             return;
-        let callbackArr = this.callbacks.get(caller);
+        var callbackArr = this.callbacks.get(caller);
         ArrayEx.Remove(callbackArr, func);
-    }
+    };
     /**
      * Invokes all callbacks registered under this event. Throws an exception if an inappropriate
      * number of args is passed.
      * */
-    Invoke(...args) {
+    Event.prototype.Invoke = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
         // Safety
         if (args.length != this.ArgCount) {
-            let message = `ERROR: call to Event invoke() passed wrong amount of arguments. \
-            Amount passed: ${args.length} Amount Needed: ${this.ArgCount}`;
+            var message = "ERROR: call to Event invoke() passed wrong amount of arguments.             Amount passed: " + args.length + " Amount Needed: " + this.ArgCount;
             //alert(message);
             throw message;
         }
         // Going through the callers...
-        let callers = Array.from(this.callbacks.keys());
-        for (let i = 0; i < callers.length; i++) {
-            let caller = callers[i];
+        var callers = ArrayEx.From(this.callbacks.keys());
+        for (var i = 0; i < callers.length; i++) {
+            var caller = callers[i];
             // Go through all the funcs registered under the caller, and execute them one by 
             // one with this object's invocation string.
-            let toExecute = this.callbacks.get(caller);
-            for (let i = 0; i < toExecute.length; i++) {
-                this.funcToCall = toExecute[i];
+            var toExecute = this.callbacks.get(caller);
+            for (var i_1 = 0; i_1 < toExecute.length; i_1++) {
+                this.funcToCall = toExecute[i_1];
                 eval(this.invocationStr);
             }
         }
-    }
-    SetupCallbackInvocationString() {
+    };
+    Event.prototype.SetupCallbackInvocationString = function () {
         this.invocationStr = 'this.funcToCall.call(' + this.callerName;
         if (this.ArgCount > 0)
             this.invocationStr += ', ';
         else
             this.invocationStr += ')';
-        for (let i = 0; i < this.ArgCount; i++) {
-            let argString = 'arguments[' + i + ']';
+        for (var i = 0; i < this.ArgCount; i++) {
+            var argString = 'arguments[' + i + ']';
             if (i == this.ArgCount - 1) // Are we at the last arg?
                 argString += ');';
             else
                 argString += ', ';
             this.invocationStr += argString;
         }
-    }
-    toString() {
+    };
+    Event.prototype.toString = function () {
         return '[object CGT.Core.Utils.Event]';
-    }
-}
+    };
+    return Event;
+}());
+export { Event };

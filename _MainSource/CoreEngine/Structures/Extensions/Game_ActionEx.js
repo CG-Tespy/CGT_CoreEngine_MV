@@ -1,33 +1,37 @@
-export class Game_ActionEx {
+var Game_ActionEx = /** @class */ (function () {
+    function Game_ActionEx() {
+    }
     /** Returns the action's item if it's a skill. Null otherwise. */
-    static AsSkill(action) {
+    Game_ActionEx.AsSkill = function (action) {
         var skill = $dataSkills[action.item().id];
         if (skill != undefined)
             return skill;
         else
             return null;
-    }
+    };
     /** Returns the action's item if it's a normal item. Null otherwise. */
-    static AsItem(action) {
+    Game_ActionEx.AsItem = function (action) {
         var item = $dataItems[action.item().id];
         if (item != undefined)
             return item;
         else
             return null;
-    }
+    };
     /** Returns this action's subject if the subject is an enemy. Null otherwise. */
-    static SubjectAsEnemy(action) {
+    Game_ActionEx.SubjectAsEnemy = function (action) {
         return Game_ActionEx.SubjectAsType(action, Game_Enemy);
-    }
-    static SubjectAsType(action, typeWanted) {
+    };
+    Game_ActionEx.SubjectAsType = function (action, typeWanted) {
         var subject = action.subject();
         if (subject instanceof typeWanted)
             return subject;
         else
             return null;
-    }
+    };
     /** Returns this action's subject if the subject is an actor. Null otherwise. */
-    static SubjectAsActor(action) {
+    Game_ActionEx.SubjectAsActor = function (action) {
         return Game_ActionEx.SubjectAsType(action, Game_Actor);
-    }
-}
+    };
+    return Game_ActionEx;
+}());
+export { Game_ActionEx };

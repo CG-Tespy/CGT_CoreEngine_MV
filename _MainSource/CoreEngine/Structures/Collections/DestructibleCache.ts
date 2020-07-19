@@ -54,7 +54,7 @@ export class DestructibleCache
 
     Remove(destructible: Destructible): boolean
     {
-        let thisHadDestructible = this.Items.includes(destructible);
+        let thisHadDestructible = ArrayEx.Includes(this.Items, destructible);
 
         if (thisHadDestructible)
         {

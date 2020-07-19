@@ -1,20 +1,24 @@
-export class ObjectEx {
-    static IsOfType(obj, input) {
-        let inputIsFunction = typeof input === 'function';
+var ObjectEx = /** @class */ (function () {
+    function ObjectEx() {
+    }
+    ObjectEx.IsOfType = function (obj, input) {
+        var inputIsFunction = typeof input === 'function';
         if (!inputIsFunction) {
             console.log("Input is not function");
             throw 'IsOfType only accepts function or class args.';
         }
-        let classOfObj = obj.constructor;
+        var classOfObj = obj.constructor;
         return this.IsOfExactType(obj, input) ||
             input.isPrototypeOf(classOfObj) ||
             classOfObj.isPrototypeOf(input);
-    }
-    static IsOfExactType(obj, input) {
-        let inputIsFunction = typeof input === 'function';
+    };
+    ObjectEx.IsOfExactType = function (obj, input) {
+        var inputIsFunction = typeof input === 'function';
         if (!inputIsFunction) {
             throw 'isOfExactType only accepts function or class args.';
         }
         return obj.constructor === input;
-    }
-}
+    };
+    return ObjectEx;
+}());
+export { ObjectEx };

@@ -189,10 +189,25 @@ declare namespace CGT
             class ArrayEx
             {
                 static Remove(arr: Array<any>, toRemove: any): void
+                /** Returns a shallow copy of the passed array. */
                 static Copy(arr: Array<any>): Array<any>
-
+                /** 
+                 * A replacement for the Array.filter function, since that function isn't 
+                 * supported in MV 1.5.1.
+                 */
                 static Filter(arr: Array<any>, test: Function, context: any): Array<any>
                 static Clear(arr: Array<any>): void
+                /** 
+                 * A replacement for the Array.from function, since that function isn't 
+                 * supported in MV 1.5.1.
+                 */
+                static From<T>(iterable: Iterable<T>): T[];
+
+                /** 
+                 * A replacement for the Array.includes function, since that function isn't 
+                 * supported in MV 1.5.1.
+                 */
+                static Includes(arr: Array<any>, item: any): boolean
             }
 
             class BitmapEx

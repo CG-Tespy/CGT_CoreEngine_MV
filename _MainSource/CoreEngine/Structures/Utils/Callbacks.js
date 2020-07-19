@@ -1,7 +1,7 @@
 import { Event } from './Event';
-export let Callbacks = SetupEvents();
+export var Callbacks = SetupEvents();
 function SetupEvents() {
-    let callbacks = {
+    var callbacks = {
         TitleScreenStart: new Event(0),
         BattleStart: new Event(0),
         BattleEnd: new Event(1),
@@ -13,11 +13,11 @@ function SetupEvents() {
 HookUpCallbacks();
 function HookUpCallbacks() {
     // Funcs to alias
-    let oldSceneTitleStart = Scene_Title.prototype.start;
-    let oldStartBattle = BattleManager.startBattle;
-    let oldEndBattle = BattleManager.endBattle;
-    let oldExecuteDamage = Game_Action.prototype.executeDamage;
-    let oldEnemyDeath = Game_Enemy.prototype.die;
+    var oldSceneTitleStart = Scene_Title.prototype.start;
+    var oldStartBattle = BattleManager.startBattle;
+    var oldEndBattle = BattleManager.endBattle;
+    var oldExecuteDamage = Game_Action.prototype.executeDamage;
+    var oldEnemyDeath = Game_Enemy.prototype.die;
     // Func aliases
     function NewSceneTitleStart() {
         oldSceneTitleStart.call(this);

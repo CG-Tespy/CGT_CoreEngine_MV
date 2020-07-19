@@ -1,31 +1,35 @@
-export class NumberEx {
-    static Clamp(num, min, max) {
+var NumberEx = /** @class */ (function () {
+    function NumberEx() {
+    }
+    NumberEx.Clamp = function (num, min, max) {
         return Math.min(Math.max(num, min), max);
-    }
-    static ClampInt(num, min, max) {
+    };
+    NumberEx.ClampInt = function (num, min, max) {
         return Math.floor(this.Clamp(num, min, max));
-    }
-    static Mod(num1, num2) {
+    };
+    NumberEx.Mod = function (num1, num2) {
         return ((num1 % num2) + num2) % num2;
-    }
-    static PadZero(num, length) {
+    };
+    NumberEx.PadZero = function (num, length) {
         var s = "" + num;
         while (s.length < length) {
             s = '0' + s;
         }
         return s;
-    }
-    static Rand(from, to) {
-        let num = from;
-        let difference = to - from;
+    };
+    NumberEx.Rand = function (from, to) {
+        var num = from;
+        var difference = to - from;
         num += Math.random() * difference;
         return num;
-    }
-    static RandInt(from, to) {
+    };
+    NumberEx.RandInt = function (from, to) {
         return Math.floor(this.Rand(from, to));
-    }
-    static Lerp(firstNum, secondNum, progress) {
+    };
+    NumberEx.Lerp = function (firstNum, secondNum, progress) {
         var difference = secondNum - firstNum;
         return firstNum + (difference * progress);
-    }
-}
+    };
+    return NumberEx;
+}());
+export { NumberEx };

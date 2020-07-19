@@ -1,0 +1,21 @@
+{
+  "name": "cgt-coreengine-mv",
+  "description": "API container for other CGT plugins",
+  "version": "1.01.01",
+  "author": "CG-Tespy",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CG-Tespy/CGT_CoreEngine_MV"
+  },
+  "scripts": {
+    "build": "tsc & (rollup -c)",
+    "babelTranspile": "babel CGT_CoreEngine_MV.js -d BabelOutput/CGT_CoreEngine_MV.js"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "rollup": "^2.00.1",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-pluginutils": "^2.8.2",
+    "typescript": "^3.9.6"
+  }
+}

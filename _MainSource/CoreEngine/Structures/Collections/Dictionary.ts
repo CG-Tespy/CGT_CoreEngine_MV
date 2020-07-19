@@ -1,3 +1,4 @@
+import { ArrayEx } from '../Extensions/ArrayEx';
 /**
  * Only here to support legacy plugins. Use Map instead when you can.
  */
@@ -95,12 +96,12 @@ export class Dictionary<TKey, TValue>
 
     HasKey(key: TKey): boolean
     {
-        return this.keys.includes(key);
+        return ArrayEx.Includes(this.keys, key);
     }
 
     HasValue(value: TValue): boolean
     {
-        return this.values.includes(value);
+        return ArrayEx.Includes(this.values, value);
     }
 
     /** Removes all key-value pairs from this dictionary. */

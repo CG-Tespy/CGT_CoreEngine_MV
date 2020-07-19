@@ -1,7 +1,7 @@
 'use strict';
 (function () {
-    let extensions = {
-        _subjectAsType(typeWanted) {
+    var extensions = {
+        _subjectAsType: function (typeWanted) {
             var subject = this.subject();
             if (subject instanceof typeWanted)
                 return subject;
@@ -11,7 +11,7 @@
         /**
          * Returns the action's item if it's a skill. Null otherwise.
          * @returns {RPG.Skill} */
-        asSkill() {
+        asSkill: function () {
             var skill = $dataSkills[this.item().id];
             if (skill != undefined)
                 return skill;
@@ -21,7 +21,7 @@
         /**
          * Returns the action's item if it's a normal item. Null otherwise.
          * @returns {RPG.Item} */
-        asItem() {
+        asItem: function () {
             var item = $dataItems[this.item().id];
             if (item != undefined)
                 return item;
@@ -32,14 +32,14 @@
          * Returns this action's subject if the subject is an enemy. Null otherwise.
          * @returns {Game_Enemy}
          */
-        subjectAsEnemy() {
+        subjectAsEnemy: function () {
             return this._subjectAsType(Game_Enemy);
         },
         /**
          * Returns this action's subject if the subject is an actor. Null otherwise.
          * @returns {Game_Actor}
          */
-        subjectAsActor() {
+        subjectAsActor: function () {
             return this._subjectAsType(Game_Actor);
         },
     };

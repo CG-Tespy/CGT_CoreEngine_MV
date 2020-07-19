@@ -1,4 +1,5 @@
 import { Event } from '../Utils/Event';
+import { ArrayEx } from '../Extensions/ArrayEx';
 
 type InputCheckFunc = (keyName: string) => void;
 
@@ -36,7 +37,7 @@ class SignalerImplementation
     constructor()
     {
         this.InitInputEventDict();
-        this.inputCheckFuncs = Array.from(this.inputEvents.keys());
+        this.inputCheckFuncs = ArrayEx.From(this.inputEvents.keys());
     }
 
     protected InitInputEventDict(): void

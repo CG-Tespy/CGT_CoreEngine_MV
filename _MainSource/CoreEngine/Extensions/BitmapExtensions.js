@@ -1,13 +1,14 @@
+import { ArrayEx } from '../Structures/Extensions/ArrayEx';
 'use strict';
 (function () {
-    let extensions = {
+    var extensions = {
         /**
          * Add a callback function that will be called when the bitmap is loaded.
          * Author: MinusGix
          * @method addLoadListener
          * @param {Function} listener The callback function
          */
-        addLoadListener(listener) {
+        addLoadListener: function (listener) {
             if (!this.isReady()) {
                 this._loadListeners.push(listener);
             }
@@ -16,11 +17,11 @@
                 listener(this);
             }
         },
-        removeLoadListener(listener) {
+        removeLoadListener: function (listener) {
             this._loadListeners.remove(listener);
         },
-        hasLoadListener(listener) {
-            return this._loadListeners.includes(listener);
+        hasLoadListener: function (listener) {
+            return ArrayEx.Includes(this._loadListeners, listener);
         },
         /**
          * Returns a resized version of the bitmap (if it is ready). Note that
@@ -28,7 +29,7 @@
          * @param {number} width
          * @param {number} height
          */
-        resized(width, height) {
+        resized: function (width, height) {
             if (!this.isReady())
                 return;
             var newBitmap = new Bitmap(width, height);
