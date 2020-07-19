@@ -26,7 +26,7 @@ export class BitmapEx
     HasLoadListener(bitmap: Bitmap, listener: Function) 
     {
         // @ts-ignore
-        return bitmap._loadListeners.includes(listener);
+        return ArrayEx.Includes(bitmap._loadListeners, listener);
     }
 
     /**

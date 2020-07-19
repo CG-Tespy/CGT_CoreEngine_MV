@@ -1,3 +1,4 @@
+import { ArrayEx } from '../Structures/Extensions/ArrayEx';
 'use strict';
 
 (function()
@@ -26,7 +27,7 @@
 
         hasLoadListener(listener: Function): boolean
         {
-            return this._loadListeners.includes(listener);
+            return ArrayEx.Includes(this._loadListeners, listener);
         },
 
         /**
