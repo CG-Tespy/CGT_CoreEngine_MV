@@ -8,8 +8,7 @@
     "url": "https://github.com/CG-Tespy/CGT_CoreEngine_MV"
   },
   "scripts": {
-    "build": "tsc & (rollup -c)",
-    "babelTranspile": "babel CGT_CoreEngine_MV.js -d BabelOutput/CGT_CoreEngine_MV.js"
+    "build": "tsc & (rollup -c)"
   },
   "dependencies": {},
   "devDependencies": {
