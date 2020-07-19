@@ -65,7 +65,7 @@ export class Event
         }
 
         // Going through the callers...
-        let callers = Array.from(this.callbacks.keys());
+        let callers = ArrayEx.From(this.callbacks.keys());
 
         for (let i = 0; i < callers.length; i++) 
         {

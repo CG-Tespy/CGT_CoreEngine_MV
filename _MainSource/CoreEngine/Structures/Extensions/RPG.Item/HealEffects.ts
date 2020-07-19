@@ -1,4 +1,5 @@
 import { EffectCodes } from './EffectCodes';
+import { ArrayEx } from '../ArrayEx';
 
 export class HealEffects
 {
@@ -59,7 +60,7 @@ export class HealEffects
 
     private IsLegitHealingEffect(effect: RPG.Effect)
     {
-        let hasHealingCode = HealEffects.Codes.includes(effect.code);
+        let hasHealingCode = ArrayEx.Includes(HealEffects.Codes, effect.code);
         let percentHealValue = effect.value1;
         let flatHealValue = effect.value2;
         let doesAnyHealing = percentHealValue > 0 || flatHealValue > 0;
