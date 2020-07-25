@@ -8,10 +8,12 @@ if you're using this plugin in your game (include the names and webpage links).
 
 Other code contributors:
 MinusGix
-Endless Illusion Software – http://endlessillusoft.com/
 Comficker - https://gist.github.com/comficker
 rob - https://stackoverflow.com/users/563532/rob
 Dr. Axel Rauschmayer - https://2ality.com/
+
+If you want to edit this plugin, you may be better off editing and 
+building the source: https://github.com/CG-Tespy/CGT_CoreEngine_MV
 
 */
 
