@@ -4489,7 +4489,9 @@ interface DecrypterStatic {
     extToEncryptExt(url: string): string;
     readEncryptionkey(): void;
 }
-declare var Decrypter: DecrypterStatic;declare namespace RPG {
+declare var Decrypter: DecrypterStatic;
+
+declare namespace RPG {
     interface MetaData {
         /**
          * The text of the note.
