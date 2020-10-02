@@ -252,65 +252,108 @@ declare namespace CGT
                 static SubjectAsActor(action: Game_Action): Game_Actor
             }
 
-            namespace Items
+            class Game_ActorEx
             {
-                class RPGItemEx
-                {
+                static CanPaySkillCost(actor: Game_Actor, skill: RPG.Skill, 
+                    howManyTimes?: number): boolean
 
-                }
-
-                enum EffectCodes
-                {
-                    HPHeal = 11,
-                    MPHeal = 12,
-                    TPHeal = 13,
-                    AddState = 21,
-                    RemoveState = 22,
-                    AddBuff = 31,
-                    AddDebuff = 32,
-                    RemoveBuff = 33,
-                    RemoveDebuff = 34,
-                    SpecialEffect = 41,
-                    Grow = 42,
-                    LearnSkill = 43,
-                    CommonEvent = 44,
-                }
-
-                
-                class HealEffects
-                {
-                    hp: RPG.Effect[];
-                    mp: RPG.Effect[];
-                    tp: RPG.Effect[];
-
-                    /** Creates an instance of this from the effects of the passed item. */
-                    static OfItem(item: RPG.Item): HealEffects
-
-                    /**
-                     * Registers any legit healing effects in the array passed. Returns true if
-                     * any were legit, false otherwise.
-                     * @param effects 
-                     */
-                    RegisterMultiple(effects: RPG.Effect[]): Boolean
-
-                    /**
-                     * If the passed effect is a legit healing effect, it gets registered as the right
-                     * type in this instance, returning true. Returns false otherwise.
-                     */
-                    Register(eff: RPG.Effect): Boolean
-
-                    private IsLegitHealingEffect(effect: RPG.Effect)
-
-                    private static Codes: Readonly<number[]>;
-
-                    /** Whether or not this has any effects registered. */
-                    Any(): Boolean
-
-                    static Null: Readonly<HealEffects>;
-                    
-                }
+                static IsAtFullHP(actor: Game_Actor): boolean
+                static IsAtFullMP(actor: Game_Actor): boolean
+                static IsAtFullTP(actor: Game_Actor): boolean
             }
 
+            /** Makes it easier to work with Items. */
+            class RPGItemEx
+            {
+                static UseItemOnActor(itemInInventory: RPG.Item, actor: Game_Actor): void
+
+                /**
+                 * Uses the item on the actor without consuming it.
+                 */
+                static FreeUseItemOnActor(itemInInventory: RPG.Item, actor: Game_Actor): void
+
+                private static ApplyItemUseOnActor(itemUse: Game_Action): void
+
+                static ForceUseItemOnActor(item: RPG.Item, actor: Game_Actor): void
+
+                static HPHealingItemsIn(items: RPG.Item[]): RPG.Item[]
+
+                /** Returns whether the item's damage type is HP Recovery. */
+                static CanHealHP(item: RPG.Item): boolean
+
+                /** Returns whether the item's damage type is MP Recovery. */
+                static CanHealMP(item: RPG.Item): boolean
+
+                static FlatHPAmountHealed(item: RPG.Item): number
+
+                static PercentHPAmountHealed(item: RPG.Item): number
+
+                /*
+                Returns the passed array with the use-disallowed items filtered out.
+                */
+                static UsablesOnly(items: RPG.Item[]): RPG.Item[]
+
+                /**
+                 * Returns teh passed array with the non-overworld-usable items filtered out.
+                 */
+                static OverworldUsablesOnly(items: RPG.Item[]): RPG.Item[]
+            }
+
+            /**
+             * Makes it easier to work with Skills.
+             */
+            class RPGSkillEx
+            {
+                /** Returns whether the skill's damage type is HP Recovery. */
+                static CanHealHP(item: RPG.Skill): boolean
+
+                /** Returns whether the skill's damage type is MP Recovery. */
+                static CanHealMP(item: RPG.Skill): boolean
+
+                static OnlyHealsHP(skill: RPG.Skill): boolean
+                /**
+                 * Returns false if the skill is not single-targeting, or if
+                 * the user can't pay the cost. True otherwise.
+                 */
+                static UseSkillOnActor(skill: RPG.Skill, user: Game_Actor, 
+                    target: Game_Actor): boolean
+
+                /**
+                 * Has the user cast the skill on the target without paying the cost.
+                 * Returns false if the skill isn't single-targeting, or if the user can't
+                 * legit use the skill. True otherwise.
+                 */
+                static FreeUseSkillOnActor(skill: RPG.Skill, user: Game_Actor, target: Game_Actor): boolean
+
+                /**
+                 * Returns false if the user can't pay the cost for applying
+                 * the skill to the targets. True otherwise.
+                 */
+                static UseSkillOnActors(skill: RPG.Skill, user: Game_Actor, 
+                    targets: Game_Actor[]): boolean
+
+                /**
+                 * Has the user cast the skill on each target, without paying the cost.
+                 * Returns false if the user can't use the skill legitimately.
+                 * True otherwise.
+                 */
+                static FreeUseSkillOnActors(skill: RPG.Skill, user: Game_Actor, targets: Game_Actor[]): boolean
+                
+                /**
+                 * Returns true if the user can pay the skill cost the specified
+                 * number of times (1 by default). False otherwise.
+                 */
+                static CanPaySkillCost(skill: RPG.Skill, user: Game_Actor, 
+                    howManyTimes?: number): boolean
+
+                static IsSingleTargeting(skill: RPG.Skill): boolean
+                static IsAllTargeting(skill: RPG.Skill): boolean
+
+                static UseSkillOnActors(skill: RPG.Skill, user: Game_Actor, 
+                    targets: Game_Actor[]): void
+            }
+
+            /** Contains static functions for working with numbers. */
             class NumberEx
             {
                 static Clamp(num: number, min: number, max: number): number
@@ -621,6 +664,176 @@ declare namespace CGT
 
             }
 
+        }
+
+        /**
+         * Utility code to make it easier to work with certain builtins that
+         * are in MV's RPG namespace.
+         */
+        namespace RPGEx
+        {
+            enum EffectCodes
+            {
+                HPHeal,
+                MPHeal,
+                TPHeal,
+                AddState,
+                RemoveState,
+                AddBuff,
+                AddDebuff,
+                RemoveBuff,
+                RemoveDebuff,
+                SpecialEffect,
+                Grow,
+                LearnSkill,
+                CommonEvent,
+            }
+
+            enum Occasion
+            {
+                Always = 0, 
+                BattleOnly = 1, 
+                MenuOnly = 2, 
+                Never = 3
+            }
+
+            enum DamageType
+            {
+                None = 0,
+                HPDamage = 1,
+                MPDamage = 2,
+                HPRecovery = 3,
+                MPRecovery = 4,
+                HPDrain = 5,
+                MPDrain = 6
+            }
+
+            /** Targeting scope of skills and items. */
+            enum Scope
+            {
+                None = 0, 
+
+                OneEnemy = 1, 
+                AllEnemies = 2, 
+
+                OneRandEnemy = 3, 
+                TwoRandEnemy = 4, 
+                ThreeRandEnemy = 5, 
+                FourRandEnemy = 6,
+
+                OneAlly = 7,
+                AllAllies = 8,
+                OneAllyDead = 9,
+                AllAlliesDead = 10,
+
+                TheUser = 11
+            }
+
+            /**
+             * The values are based off the codes the effect types are assigned
+             * in the base Effect class.
+             */
+            enum EffectType
+            {
+                Null = -1,
+                HPHeal = 11,
+                MPHeal = 12, 
+                TPGain = 13,
+                AddState = 21,
+                RemoveState = 22,
+                AddBuff = 31,
+                AddDebuff = 32,
+                RemoveBuff = 33,
+                RemoveDebuff = 34,
+                SpecialEffect = 41,
+                Grow = 42,
+                LearnSkill = 43,
+                CommonEvent = 44
+            }
+
+            enum HitType
+            {
+                Null = -1,
+                CertainHit = 0,
+                Physical = 1,
+                Magical = 2
+            }
+
+            /**
+            * Represents state for effects that recover HP, MP, or TP.
+            */
+            class HealEffect extends UseEffect
+            {
+                get PercentRecovery(): number
+                get FlatRecovery(): number
+
+                set PercentRecovery(value: number)
+                set FlatRecovery(value: number)
+
+                protected static validCodes: EffectType;
+
+                static Null: Readonly<HealEffect>;
+                
+            }
+            
+            /**
+             * Encapsulates basic healing effects involving, HP, MP, or TP
+             */
+            class HealEffectSet
+            {
+                hp: HealEffect[];
+                mp: HealEffect[];
+                tp: HealEffect[];
+
+                /** Creates an instance of this from the effects of the passed item. */
+                static FromItem(item: RPG.Item): HealEffectSet
+
+                /**
+                 * Registers any legit healing effects in the array passed. Returns true if
+                 * any were legit, false otherwise.
+                 * @param effects 
+                 */
+                RegisterMultiple(effects: RPG.Effect[]): Boolean
+
+                /**
+                 * If the passed effect is a legit healing effect, it gets registered as the right
+                 * type in this instance, returning true. Returns false otherwise.
+                 */
+                Register(eff: RPG.Effect): Boolean
+
+                /** Whether or not this has any effects registered. */
+                Any(): Boolean
+
+                static Null: Readonly<HealEffectSet>;
+                
+            }
+
+            enum ItemType
+            {
+                Regular = 1, 
+                Key = 2, 
+                HiddenA = 3, 
+                HiddenB = 4
+            }
+
+            /**
+             * Wrapper for MV's Effect class, which represents effects
+             * you can set up in an Item's or Skill's effect settings.
+             */
+            class UseEffect implements RPG.Effect
+            {
+                code: number;
+                dataId: number;
+                value1: number;
+                value2: number;
+
+                get Type(): EffectType
+
+                static FromDBEffect(dbEffect: RPG.Effect): UseEffect
+
+                static Null: Readonly<UseEffect>;
+                
+            }
         }
 
         namespace Text

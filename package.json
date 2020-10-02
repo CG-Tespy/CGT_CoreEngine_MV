@@ -1,20 +1,29 @@
 {
   "name": "cgt-core-engine-mv",
   "description": "API container for other CGT plugins",
-  "version": "1.01.03",
+  "version": "1.01.06b",
   "author": "CG-Tespy",
   "repository": {
     "type": "git",
     "url": "https://github.com/CG-Tespy/CGT_CoreEngine_MV"
   },
   "scripts": {
-    "build": "tsc & (rollup -c)"
+    "build": "tsc & (rollup -c)",
+    "test": "mocha -r ts-node/register Test/**/*.ts"
   },
   "dependencies": {},
   "devDependencies": {
+    "@types/chai": "^4.2.12",
+    "@types/mocha": "^8.0.0",
+    "@types/sinon": "^9.0.4",
+    "chai": "^4.2.0",
+    "mocha": "^8.0.1",
     "rollup": "^2.00.1",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-pluginutils": "^2.8.2",
+    "sinon": "^9.0.2",
+    "ts-node": "^8.10.2",
     "typescript": "^3.9.6"
   }
+  
 }

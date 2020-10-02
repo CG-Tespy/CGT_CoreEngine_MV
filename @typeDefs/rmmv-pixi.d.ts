@@ -6454,7 +6454,7 @@ declare var $dataActors: Array<RPG.Actor>;
 /** @global RPGMakerMV Class data. */
 declare var $dataClasses: Array<RPG.Class>;
 /** @global RPGMakerMV Skill data. */
-declare var $dataSkills: Array<RPG.Skill>;
+declare var arr: Array<RPG.Skill>;
 /** @global RPGMakerMV Item data. */
 declare var $dataItems: Array<RPG.Item>;
 /** @global RPGMakerMV Weapon data. */
@@ -6484,6 +6484,8 @@ declare var $gameTemp: Game_Temp;
 /** @global RPGMakerMV Game System data; saved with the game.
  * @type {Game_Temp}
 */
+/** @global RPGMakerMV Skill data. */
+declare var $dataSkills: Array<RPG.Skill>;
 declare var $gameSystem: Game_System;
 /** @global RPGMakerMV Game Screen; contains properties and methods
  * for adjusting the game screen.
