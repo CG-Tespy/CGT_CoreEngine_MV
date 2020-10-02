@@ -1,5 +1,6 @@
-import { EffectType } from './Enums';
-import { UseEffect } from './UseEffect';
+
+import { UseEffect } from '../UseEffect';
+import { EffectType } from "../EffectType";
 
 /**
  * For effects that change state, like adding or removing Poison.

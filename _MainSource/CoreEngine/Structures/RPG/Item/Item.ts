@@ -1,9 +1,11 @@
 import { GeneralSettings } from './GeneralSettings';
 import { InvocationSettings } from '../InvocationSettings';
 import { DamageSettings } from './DamageSettings';
-import { ItemOccasion, ItemType, ItemScope, ItemCategory } from './Enums';
-import { UseEffect } from './UseEffect';
+import { ItemType, ItemCategory } from './Enums';
+import { UseEffect } from '../UseEffect';
 import { HitType } from '../Enums';
+import { Occasion } from '../Occasion';
+import { Scope } from '../Scope';
 
 /**
  * A wrapper for MV's RPG.Item class
@@ -65,11 +67,11 @@ export class ItemGeneralSettings implements GeneralSettings
     get HitType(): HitType { return this.hitType; }
     private hitType: HitType = HitType.Null;
 
-    get Scope(): ItemScope { return this.scope; }
-    private scope: ItemScope = ItemScope.None;
+    get Scope(): Scope { return this.scope; }
+    private scope: Scope = Scope.None;
 
-    get Occasion(): ItemOccasion { return this.occasion; }
-    private occasion: ItemOccasion = ItemOccasion.Never;
+    get Occasion(): Occasion { return this.occasion; }
+    private occasion: Occasion = Occasion.Never;
 
     get Categories(): ItemCategory[] { return this.categories; }
     private categories: ItemCategory[] = [];

@@ -1,4 +1,4 @@
-import { UseEffect } from './UseEffect';
+import { UseEffect } from '../UseEffect';
 
 /**
  * Represents the effect settings as they were set in an Item's or

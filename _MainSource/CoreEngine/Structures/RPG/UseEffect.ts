@@ -1,5 +1,5 @@
-import { EffectType } from './Enums';
-import { ArrayEx } from '../../Extensions/ArrayEx';
+import { EffectType } from "./EffectType"
+import { ArrayEx } from '../Extensions/ArrayEx';
 
 /**
  * Wrapper for MV's Effect class, which represents effects

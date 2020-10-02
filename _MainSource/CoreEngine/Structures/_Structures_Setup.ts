@@ -8,4 +8,6 @@ export * as PluginCommands from "./PluginCommands/_PluginCommands_Setup";
 export * as PluginParams from "./PluginParams/_PluginParams_Setup";
 export * as Text from "./Text/_Text_Setup";
 export * as Utils from "./Utils/_Utils_Setup";
+export * as RPGEx from "./RPG/_RPG_Setup";
+export let version = 10106;
 
