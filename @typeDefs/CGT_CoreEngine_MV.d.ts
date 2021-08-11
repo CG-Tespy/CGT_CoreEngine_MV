@@ -75,6 +75,45 @@ declare namespace CGT
             }
         }
 
+        namespace Battle
+        {
+            /**
+             * Contains info relating to some skill being landed. 
+             */
+            export class DamageArgs
+            {
+                /** Skill used to do the damage, if applicable. */
+                get Skill(): RPG.Skill;
+
+                /** Item used to do the damage, if applicable. */
+                get Item(): RPG.Item;
+
+                /** The battler that used the skill. */
+                get User(): Game_Battler;
+
+                /** Whether or not a crit was landed. */
+                get LandedCrit(): boolean;
+
+                /** The target's Game_ActionResult object. Same as calling Target.result() */
+                get Result(): Game_ActionResult;
+
+                /** How much damage the skill dealt to the target. */
+                get HPDamageDealt(): number;
+                get MPDamageDealt(): number;
+                get TPDamageDealt(): number;
+
+                /** States successfully applied to the target by the Skill. */
+                get StatesApplied(): RPG.State[] ;
+
+                /** The battlers that got damaged. */
+                get Target(): Game_Battler;
+
+
+                static From(target: Game_Battler, action: Game_Action): DamageArgs
+
+            }
+        }
+
         namespace Collections
         {
             class ArrayIterator<TValue> extends CGTIterator<Array<TValue>, TValue>
@@ -632,6 +671,8 @@ declare namespace CGT
 
             let commandMap: Map<string, RawCommandFunc>;
             function Register(commandName: string, func: RawCommandFunc): void;
+            /** The strings are the command names */
+            function RegisterMulti(toRegister: Map<string, RawCommandFunc>);
         }
 
         namespace PluginParams
@@ -639,11 +680,11 @@ declare namespace CGT
             class PluginParamObjectFactory<TReal, TParsedRaw>
             {
                 static get ClassOfObjectCreated(): Function
-                
                 get ClassOfObjectCreated(): any
 
-                protected paramToCreateFrom: string;
+                /** The plugin param with its surface members destringified. */
                 protected parsedParam: TParsedRaw;
+                // The instance of the custom class you set up based on parsedParam
                 protected baseObject: TReal;
 
                 CreateObjectFrom(param: string): TReal
@@ -653,6 +694,8 @@ declare namespace CGT
 
                 protected ApplyParamValuesToBaseObject(): void
                 protected ApplyPrimitiveValues(): void
+
+                // These are the hooks
                 protected ApplyBooleans(): void
                 protected ApplyNumbers(): void
                 protected ApplyStrings(): void
@@ -878,6 +921,17 @@ declare namespace CGT
                 BattleEnd: Utils.Event;
                 DamageExecute: Utils.Event;
                 EnemyDeath: Utils.Event;
+
+                /** 1 arg: SkillHitArgs */
+                CriticalHit: Utils.Event;
+                /** 1 arg: SkillHitArgs */
+                AttackResisted: Utils.Event;
+                /** 1 arg: SkillHitArgs */
+                AttackNulled: Utils.Event;
+                /** 1 arg: SkillHitArgs */
+                WeaknessExploited: Utils.Event;
+                /** 1 arg: SkillHitArgs */
+                StateApplied: Utils.Event;
             };
 
             interface IEquatable<T>

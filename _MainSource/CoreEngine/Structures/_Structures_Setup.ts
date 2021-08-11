@@ -1,4 +1,5 @@
 export * as Audio from "./Audio/_Audio_Setup";
+export * as Battle from "./Battle/_Battle_Setup";
 export * as Collections from "./Collections/_Collections_Setup";
 export * as Graphics from "./Graphics/_Graphics_Setup";
 export * as Extensions from "./Extensions/_Extensions_Setup";
@@ -9,5 +10,5 @@ export * as PluginParams from "./PluginParams/_PluginParams_Setup";
 export * as Text from "./Text/_Text_Setup";
 export * as Utils from "./Utils/_Utils_Setup";
 export * as RPGEx from "./RPG/_RPG_Setup";
-export let version = 10106;
 
+export let version = 10108;

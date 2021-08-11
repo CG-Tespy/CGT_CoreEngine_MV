@@ -3,9 +3,9 @@ import { InvocationSettings } from '../InvocationSettings';
 import { DamageSettings } from './DamageSettings';
 import { ItemType, ItemCategory } from './Enums';
 import { UseEffect } from '../UseEffect';
-import { HitType } from '../Enums';
 import { Occasion } from '../Occasion';
 import { Scope } from '../Scope';
+import { HitType } from '../HitType';
 
 /**
  * A wrapper for MV's RPG.Item class

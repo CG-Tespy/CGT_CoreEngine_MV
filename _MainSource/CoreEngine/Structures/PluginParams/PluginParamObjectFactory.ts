@@ -53,7 +53,7 @@ export class PluginParamObjectFactory<TReal, TParsedRaw>
 
     protected ApplyStrings(): void { }
 
-    protected ApplyCustomValues(): void {}
+    protected ApplyCustomValues(): void { }
 
     CreateObjectsFrom(stringifiedParamArr): TReal[]
     {

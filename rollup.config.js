@@ -6,7 +6,8 @@ export default {
 	{
 		file: "./CGT_CoreEngine_MV.js",
 		format: 'iife',
-		freeze: false,
+        freeze: false,
+        
 	},
 
 	plugins: [

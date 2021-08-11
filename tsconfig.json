@@ -8,6 +8,5 @@
       "sourceMap": false,
       "downlevelIteration": true,
     },
-    "include": ["_MainSource/**/*", "Test/**/*", "@typeDefs/**/*"],
 }
 
