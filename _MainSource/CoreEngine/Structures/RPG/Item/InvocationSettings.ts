@@ -1,4 +1,5 @@
-import { HitType } from '../Enums';
+import { HitType } from "../HitType";
+
 
 export class InvocationSettings
 {
