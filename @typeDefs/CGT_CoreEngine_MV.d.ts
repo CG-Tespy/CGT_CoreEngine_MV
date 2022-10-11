@@ -420,6 +420,26 @@ declare namespace CGT
                     number, targetHeight: number): void
             }
 
+            class PluginParamEx 
+            {
+                // For those stringified num arrs that the PluginManager has them start as
+                static DatabaseElementsFromStringNumArr<TDatabaseElement extends RPG.Actor |
+                RPG.Class | RPG.Skill | RPG.Item |
+                RPG.Weapon | RPG.Armor | RPG.Enemy |
+                RPG.Troop | RPG.State | RPG.Animation |
+                RPG.Tileset | RPG.CommonEvent >(stringifiedNumArr: string, 
+                                                databaseElemArr: TDatabaseElement[]): 
+                                                TDatabaseElement[]
+
+                static DatabaseElementsFromNumArr<TDatabaseElement extends RPG.Actor |
+                RPG.Class | RPG.Skill | RPG.Item |
+                RPG.Weapon | RPG.Armor | RPG.Enemy |
+                RPG.Troop | RPG.State | RPG.Animation |
+                RPG.Tileset | RPG.CommonEvent >(numArr: number[], 
+                                                databaseElemArr: TDatabaseElement[]):
+                                                TDatabaseElement[]
+            }
+
         }
 
         namespace Graphics
