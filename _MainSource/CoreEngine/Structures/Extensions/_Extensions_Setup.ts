@@ -8,4 +8,5 @@ export * from "./Game_ActorEx";
 export * from "./RPGItemEx";
 export * from "./RPGSkillEx";
 export * from "./PluginParamEx";
+export * from "./StringEx";
 

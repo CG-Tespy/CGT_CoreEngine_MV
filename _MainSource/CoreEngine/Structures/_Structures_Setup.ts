@@ -11,4 +11,4 @@ export * as Text from "./Text/_Text_Setup";
 export * as Utils from "./Utils/_Utils_Setup";
 export * as RPGEx from "./RPG/_RPG_Setup";
 
-export let version = 10108;
+export let version = "1.01.17";

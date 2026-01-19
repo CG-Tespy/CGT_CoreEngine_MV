@@ -46,6 +46,29 @@ export class PluginParamEx
         return dbElements;
     }
 
+    /** Takes variable codes into account (a la \V[x])*/
+    static ParamArgToNumber(paramArg: string)
+    {
+        let IsVariable = PluginParamEx.IsVariable;
+        let varRegex = PluginParamEx.varRegex;
 
+        if (IsVariable(paramArg))
+        {
+            let matches = paramArg.match(varRegex);
+            let varIndex = Number(matches[1]);
+            let varValue = $gameVariables.value(varIndex);
+            return varValue;
+        }
+        
+        return Number(paramArg);
+    }
+
+    static IsVariable(input): boolean
+    {
+        let varRegex = PluginParamEx.varRegex;
+        return varRegex.test(input);
+    }
+
+    static varRegex = /\\V\[(\d+)\]/i;
 
 }
